@@ -1,0 +1,2659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perioperative Insulin Management</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+:root{
+  --cl-dark:#1e293b;--cl-accent:#06b6d4;--cl-accent-dk:#0891b2;
+  --primary:#1a4a7a;--primary-lt:#2563a8;--primary-pale:#dbeafe;
+  --danger:#b91c1c;--danger-mid:#dc2626;--danger-light:#fee2e2;
+  --danger-pale:#fff5f5;--danger-muted:#7f1d1d;
+  --warning:#b45309;--warning-lt:#fef3c7;
+  --success:#15803d;--success-lt:#dcfce7;
+  --info:#0369a1;--info-lt:#e0f2fe;
+  --neutral:#f1f5f9;--border:#e2e8f0;--border-dk:#cbd5e1;
+  --text:#1e293b;--muted:#64748b;--bg:#f0f4f8;--white:#ffffff;
+  --alg1:#1d4ed8;--alg2:#0369a1;--alg3:#d97706;--alg4:#b91c1c;
+  --s1:#7c3aed;--s2:#1d4ed8;--s3:#d97706;--s4:#b91c1c;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+
+/* ══ GLOBAL SIDEBAR OVERLAY ══ */
+.hub-menu-btn{background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:6px 12px;font-size:16px;cursor:pointer;margin-right:16px;transition:background 0.15s;display:flex;align-items:center;justify-content:center;}
+.hub-menu-btn:hover{background:rgba(255,255,255,0.2);}
+.global-sidebar{position:fixed;top:0;left:-300px;width:280px;height:100vh;background:white;z-index:2000;box-shadow:4px 0 24px rgba(0,0,0,0.25);transition:left 0.3s cubic-bezier(0.16, 1, 0.3, 1);display:flex;flex-direction:column;}
+.global-sidebar.open{left:0;}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(15,45,82,0.6);backdrop-filter:blur(2px);z-index:1999;opacity:0;pointer-events:none;transition:opacity 0.3s ease;}
+.sidebar-overlay.open{opacity:1;pointer-events:auto;}
+.global-sidebar .sidebar-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--neutral);}
+.global-sidebar .sidebar-content{padding:20px;flex:1;overflow-y:auto;}
+.global-sidebar .sidebar-section{border-radius:8px;padding:14px;border:1px solid var(--border-dk);background:white;box-shadow:0 1px 4px rgba(0,0,0,0.03);margin-bottom:16px;}
+.global-sidebar .sidebar-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;}
+.global-sidebar .sidebar-link{display:flex;align-items:center;gap:8px;color:var(--primary-lt);font-size:13px;font-weight:600;padding:8px 0;cursor:pointer;text-decoration:none;border-bottom:1px solid var(--border);transition:color .15s;}
+.global-sidebar .sidebar-link:last-child{border-bottom:none;padding-bottom:0;}
+.global-sidebar .sidebar-link:hover{color:var(--primary);}
+
+/* ══ GLOBAL HEADER & NAV ══ */
+.hub-header{background:linear-gradient(135deg,#0f2d52 0%,#1a4a8a 100%);color:white;height:56px;display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:600;box-shadow:0 2px 16px rgba(15,45,82,.35);}
+.hub-logo{display:flex;flex-direction:column;flex:1;min-width:0;margin-right:16px;}
+.hub-logo-title{font-size:14px;font-weight:700;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hub-logo-sub{font-size:10px;color:rgba(186,230,255,.8);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.hub-hypo-btn{background:#dc2626;color:white;border:none;border-radius:8px;padding:8px 18px;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.02em;display:flex;align-items:center;gap:6px;flex-shrink:0;transition:background .15s,transform .1s;box-shadow:0 2px 8px rgba(220,38,38,.4)}
+.hub-hypo-btn:hover{background:#b91c1c;transform:translateY(-1px)}
+.hub-hypo-btn:active{transform:scale(.98)}
+
+.hub-nav{background:white;border-bottom:2px solid var(--border);display:flex;padding:0 20px;position:sticky;top:56px;z-index:590;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;}
+.hub-nav::-webkit-scrollbar{display:none;width:0;height:0;-webkit-appearance:none;}
+.hub-tab{background:none;border:none;border-bottom:3px solid transparent;padding:12px 20px;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;margin-bottom:-2px;display:flex;align-items:center;gap:6px;border-radius:8px 8px 0 0}
+.hub-tab:hover{color:#1e5fa8;background:#f8fafc}
+.hub-tab.active{color:#0f4c8a;border-bottom-color:#06b6d4;background:#f0f7ff;font-weight:800}
+.hub-tab.hypo-tab{color:#b91c1c}
+.hub-tab.hypo-tab:hover{background:#fff5f5}
+.hub-tab.hypo-tab.active{color:#dc2626;border-bottom-color:#dc2626;background:#fef2f2}
+
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* Target Pill styles */
+.target-pill{background:var(--cl-accent);color:var(--cl-dark);border-radius:20px;padding:5px 16px;font-size:12px;font-weight:800;letter-spacing:.02em;white-space:nowrap;}
+
+/* Home specific */
+.home-content{max-width:760px;margin:0 auto;padding:32px 24px 60px}
+.home-hero{text-align:center;margin-bottom:28px}
+.home-hero h2{font-size:20px;font-weight:800;color:#0f2d52;margin-bottom:5px;letter-spacing:-.01em}
+.home-hero p{font-size:12px;color:var(--muted);line-height:1.6}
+.decision-card{background:white;border-radius:14px;border:1.5px solid var(--border);box-shadow:0 2px 16px rgba(0,0,0,.06);overflow:hidden;margin-bottom:24px}
+.q-step{padding:20px 22px;border-bottom:1px solid var(--border);transition:opacity .2s}
+.q-step:last-child{border-bottom:none}
+.q-step.locked{opacity:.38;pointer-events:none}
+.q-label{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px;font-weight:700;color:var(--text)}
+.q-num{background:#0f2d52;color:#06b6d4;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.q-options{display:flex;flex-direction:row;gap:8px;flex-wrap:wrap}
+.q-btn{flex:1;min-width:140px;border:2px solid var(--border-dk);border-radius:10px;padding:12px 14px;cursor:pointer;background:var(--neutral);text-align:left;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif;transition:all .15s;display:flex;flex-direction:column;gap:2px}
+.q-btn:hover{border-color:#1e5fa8;background:#f0f7ff}
+.q-btn.selected{border-color:#0891b2;background:#e0f9ff;box-shadow:0 0 0 3px rgba(6,182,212,.15)}
+.q-btn[data-val="yes"].selected{border-color:#1e5fa8;background:#dbeafe}
+.q-btn[data-val="no"].selected{border-color:#16a34a;background:#dcfce7}
+.q-btn-icon{font-size:18px;margin-bottom:3px}
+.q-btn-title{font-size:12px;font-weight:700;color:var(--text)}
+.q-btn-sub{font-size:10px;color:var(--muted)}
+.q-btn.selected .q-btn-title{color:#0f2d52}
+
+/* Result box */
+.q-result{padding:20px 22px;background:linear-gradient(135deg,#e0f9ff 0%,#eff6ff 100%);border-top:2.5px solid #06b6d4;display:none;text-align:center}
+.q-result.visible{display:block}
+.q-result-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#0891b2;margin-bottom:6px}
+.q-result-protocol{font-size:17px;font-weight:800;color:#0f2d52;margin-bottom:6px}
+.q-result-desc{font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6;max-width:480px;margin-left:auto;margin-right:auto}
+.q-result-btn{background:#1e5fa8;color:white;border:none;border-radius:8px;padding:11px 32px;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:8px;box-shadow:0 2px 10px rgba(30,95,168,.25)}
+.q-result-btn:hover{background:#0f4c8a;transform:translateY(-1px)}
+
+/* Quick access */
+.quick-section-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.quick-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.quick-card{background:white;border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.04);display:flex;align-items:center;gap:10px}
+.quick-card:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.09)}
+.qc-icon{font-size:20px;flex-shrink:0}
+.qc-body{min-width:0}
+.qc-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+.qc-sub{font-size:10px;color:var(--muted);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quick-card.hg-card{border-left:4px solid #1e5fa8}
+.quick-card.sq-card{border-left:4px solid var(--success)}
+.quick-card.hypo-card{border-left:4px solid var(--danger-mid)}
+.home-disclaimer{margin-top:22px;padding:10px 14px;background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid #d97706;border-radius:6px;font-size:11px;color:#78350f;line-height:1.5}
+
+@media(max-width:640px){
+  .hub-header{padding:0 14px;height:50px}
+  .hub-menu-btn{margin-right:10px;padding:5px 10px;font-size:14px;}
+  .hub-logo-sub{display:none}
+  .hub-hypo-btn{font-size:12px;padding:7px 12px}
+  .hub-nav{padding:0 10px}
+  .hub-tab{padding:10px 12px;font-size:11px}
+  .quick-cards{grid-template-columns:1fr}
+  .home-content{padding:18px 14px 50px}
+  .home-hero h2{font-size:17px}
+  .q-options{flex-direction:column!important}
+}
+
+/* ══ COMMON PROTOCOL LAYOUT ══ */
+.layout{ display: flex; min-height: calc(100vh - 58px); }
+.main{ flex: 1; padding: 28px 32px 60px; overflow-x: hidden; }
+.flow-wrap{ display: flex; flex-direction: column; align-items: center; gap: 0; width: 100%; max-width: 860px; margin: 0 auto; }
+.connector{ display: flex; flex-direction: column; align-items: center; margin: 3px 0; }
+.vl{ width: 2px; background: #94a3b8; }
+.ah{ width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent; border-top:9px solid #94a3b8; }
+.step-label{ width: 100%; display: flex; align-items: center; gap: 10px; margin: 20px 0 8px; }
+.step-num{ background: var(--cl-dark); color: var(--cl-accent); border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+.step-text{ font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text); flex: 1; }
+.step-line{ flex: 1; height: 1px; background: var(--border-dk); }
+.trigger-node{ width: 100%; background: linear-gradient(135deg, #1a1614 0%, #111010 60%, #1c1508 100%); border-left: 6px solid var(--cl-accent); border-radius: 10px; padding: 18px 24px; display: flex; align-items: center; gap: 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(6,182,212,0.08); }
+.trigger-node .icon{ font-size: 30px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 1px 4px rgba(255,205,0,0.3)); }
+.trigger-node h2{ font-size: 16px; font-weight: 800; color: #ffffff; margin-bottom: 5px; letter-spacing: 0.01em; text-shadow: 0 1px 6px rgba(0,0,0,0.5); }
+.trigger-node p{ font-size: 11.5px; color: rgba(186,230,255,.85); font-style: normal; font-weight: 500; letter-spacing: 0.02em; }
+
+
+/* === HYPERGLYCEMIA (scoped #tab-hg) === */
+#tab-hg .connector-badge{ background: white; border: 1px solid var(--border-dk); border-radius: 20px; padding: 2px 12px; font-size: 11px; font-weight: 600; color: var(--muted); margin: 3px 0; white-space: nowrap; }
+#tab-hg .connector-badge.gold{ background: var(--cl-accent); border-color: var(--cl-accent-dk); color: var(--cl-dark); font-weight: 800; }
+#tab-hg .alg-select-panel{ width: 100%; background: white; border: 2px solid var(--cl-dark); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+#tab-hg .alg-select-header{ background: var(--cl-dark); color: white; padding: 10px 20px; font-weight: 700; font-size: 12px; display: flex; align-items: center; gap: 8px; }
+#tab-hg .alg-select-header .gold{ color: var(--cl-accent); }
+#tab-hg .alg-select-body{ padding: 14px 18px; display: flex; gap: 14px; }
+#tab-hg .alg-option{ flex: 1; border: 2.5px solid var(--border-dk); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; background: var(--neutral); user-select: none; }
+#tab-hg .alg-option:hover{ border-color: var(--cl-dark); background: #f8fafc; }
+#tab-hg .alg-option.selected{ border-color: var(--cl-accent-dk); background: #fffdf0; box-shadow: 0 0 0 3px rgba(6,182,212,0.25); }
+#tab-hg .alg-opt-badge{ display: inline-block; border-radius: 5px; padding: 2px 10px; font-size: 11px; font-weight: 800; margin-bottom: 8px; font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; letter-spacing: 0.03em; background: var(--border-dk); color: var(--muted); }
+#tab-hg .alg-option.selected .alg-opt-badge{ background: var(--cl-dark); color: var(--cl-accent); }
+#tab-hg .alg-opt-title{ font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+#tab-hg .alg-opt-desc{ font-size: 11px; color: var(--muted); line-height: 1.5; }
+#tab-hg .alg-opt-check{ margin-top: 10px; font-size: 11px; font-weight: 700; color: transparent; display: flex; align-items: center; gap: 5px; }
+#tab-hg .alg-option.selected .alg-opt-check{ color: var(--success); }
+#tab-hg .rate-table-wrap{ width: 100%; background: white; border: 1.5px solid var(--border-dk); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+#tab-hg .rate-table-header{ background: var(--cl-dark); color: white; padding: 10px 18px; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: space-between; }
+#tab-hg .rate-table-header .active-alg-pill{ font-size: 11px; font-weight: 800; background: var(--cl-accent); color: var(--cl-dark); border-radius: 20px; padding: 3px 14px; font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; transition: background 0.2s; }
+#tab-hg table.rt{ width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; font-size: 12px; }
+#tab-hg .rt th{ padding: 8px 10px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border-bottom: 2px solid var(--border-dk); border-right: 1px solid var(--border); }
+#tab-hg .rt th:last-child{ border-right: none; }
+#tab-hg .rt th.bg-th{ background: #334155; color: white; text-align: left; padding-left: 16px; }
+#tab-hg .rt th.a1{ background: var(--alg1); color: white; }
+#tab-hg .rt th.a2{ background: var(--alg2); color: white; }
+#tab-hg .rt th.a3{ background: var(--alg3); color: white; }
+#tab-hg .rt th.a4{ background: var(--alg4); color: white; }
+#tab-hg .rt td{ padding: 6px 10px; text-align: center; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); color: var(--muted); transition: background 0.15s; }
+#tab-hg .rt td:last-child{ border-right: none; }
+#tab-hg .rt tr:last-child td{ border-bottom: none; }
+#tab-hg .rt .bg-cell{ background: var(--neutral); font-weight: 700; color: var(--text); text-align: left; padding-left: 16px; border-right: 2px solid var(--border-dk); }
+#tab-hg .rt .r1{ color: var(--alg1); }
+#tab-hg .rt .r2{ color: var(--alg2); }
+#tab-hg .rt .r3{ color: var(--alg3); }
+#tab-hg .rt .r4{ color: var(--alg4); font-weight: 700; }
+#tab-hg .rt td.col-active{ font-weight: 800; font-size: 13px; }
+#tab-hg .rt td.col-active.r1{ background: rgba(29,78,216,0.08); }
+#tab-hg .rt td.col-active.r2{ background: rgba(3,105,161,0.08); }
+#tab-hg .rt td.col-active.r3{ background: rgba(217,119,6,0.08); }
+#tab-hg .rt td.col-active.r4{ background: rgba(185,28,28,0.08); }
+#tab-hg .rt tr.row-active td{ background: #fffbeb !important; }
+#tab-hg .rt tr.row-active td.bg-cell{ background: #fef3c7 !important; color: var(--cl-dark); }
+#tab-hg .rt tr.row-active td.col-active{ background: var(--cl-accent) !important; color: var(--cl-dark) !important; font-weight: 900; font-size: 14px; box-shadow: inset 0 0 0 2px var(--cl-accent-dk); }
+#tab-hg .rt tr.hypo-row td{ background: var(--danger-light); color: var(--danger); font-weight: 700; text-align: center; }
+#tab-hg .dose-block{ width: 100%; background: white; border: 2px solid var(--cl-dark); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+#tab-hg .dose-block-header{ background: var(--cl-dark); color: white; padding: 11px 20px; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: space-between; }
+#tab-hg .dose-block-header .badge{ font-size: 10px; background: var(--cl-accent); color: var(--cl-dark); border-radius: 20px; padding: 2px 12px; font-weight: 800; }
+#tab-hg .dose-block-body{ padding: 18px 20px; display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+#tab-hg .input-group{ display: flex; flex-direction: column; gap: 5px; }
+#tab-hg .input-group label{ font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+#tab-hg .bg-input-wrap{ position: relative; }
+#tab-hg .bg-input{ width: 160px; border: 2px solid var(--border-dk); border-radius: 8px; padding: 10px 44px 10px 14px; font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; font-size: 20px; font-weight: 700; color: var(--text); background: var(--neutral); transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; -moz-appearance: textfield; }
+#tab-hg .bg-input::-webkit-inner-spin-button{ -webkit-appearance: none; }
+#tab-hg .bg-input:focus{ outline: none; border-color: var(--cl-dark); background: white; box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.10); }
+#tab-hg .bg-input[readonly]{ background-color: #e2e8f0; color: #475569; border-color: #cbd5e1; cursor: default; box-shadow: none; }
+#tab-hg .new-bg-field{ position: relative; }
+#tab-hg .new-bg-label{ color: #15803d !important; font-weight: 900 !important; font-size: 11px !important; display: flex; align-items: center; gap: 4px; }
+#tab-hg .new-bg-arrow{ color: #16a34a; font-size: 9px; }
+#tab-hg .new-bg-field .bg-input:placeholder-shown{ border-color: #16a34a; background: #f0fdf4; }
+#tab-hg .new-bg-field .bg-input:focus{ border-color: #15803d; background: white; box-shadow: 0 0 0 4px rgba(21,128,61,0.15); }
+#tab-hg .new-bg-field .bg-input:not(:placeholder-shown){ border-color: var(--cl-dark); background: white; }
+#tab-hg .new-bg-hint{ font-size: 10px; color: #16a34a; font-weight: 600; margin-top: 4px; letter-spacing: 0.01em; }
+#tab-hg .new-bg-field:has(.bg-input:not(:placeholder-shown)) .new-bg-hint{ display: none; }
+#tab-hg .bg-unit{ position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 700; color: var(--muted); font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif; }
+#tab-hg .rate-output{ flex: 1; min-width: 200px; background: var(--neutral); border: 2px solid var(--border-dk); border-radius: 8px; padding: 10px 18px; transition: all 0.2s; min-height: 56px; display: flex; align-items: center; gap: 14px; }
+#tab-hg .rate-output.active{ background: var(--cl-accent); border-color: var(--cl-accent-dk); box-shadow: 0 2px 10px rgba(6,182,212,0.35); }
+#tab-hg .rate-output .rate-val{ font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; font-size: 26px; font-weight: 800; color: var(--border-dk); transition: color 0.2s; line-height: 1; }
+#tab-hg .rate-output.active .rate-val{ color: var(--cl-dark); }
+#tab-hg .rate-output .rate-meta{ font-size: 12px; color: var(--muted); transition: color 0.2s; }
+#tab-hg .rate-output.active .rate-meta{ color: rgba(0,0,0,0.6); }
+#tab-hg .rate-output .rate-unit{ font-size: 13px; font-weight: 600; color: var(--muted); }
+#tab-hg .rate-output.active .rate-unit{ color: rgba(0,0,0,0.7); }
+#tab-hg .hypo-warning{ display: none; width: 100%; margin-top: 12px; background: var(--danger-light); border: 2px solid var(--danger-mid); border-radius: 8px; padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--danger); align-items: center; gap: 10px; }
+#tab-hg .hypo-warning.visible{ display: flex; }
+#tab-hg .hypo-warning a{ background: var(--danger); color: white; border-radius: 5px; padding: 4px 12px; text-decoration: none; font-size: 11px; font-weight: 700; white-space: nowrap; margin-left: auto; transition: filter 0.15s;}
+#tab-hg .hypo-warning a:hover { filter: brightness(1.1); }
+
+/* SubQ hypo warning — hidden by default */
+#tab-subq .hypo-warning{ display: none; width: 100%; margin-top: 10px; background: var(--danger-light); border: 2px solid var(--danger-mid); border-radius: 8px; padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--danger); align-items: center; gap: 10px; }
+#tab-subq .hypo-warning.visible{ display: flex; }
+#tab-subq .hypo-warning a{ background: var(--danger); color: white; border-radius: 5px; padding: 4px 12px; text-decoration: none; font-size: 11px; font-weight: 700; white-space: nowrap; margin-left: auto; transition: filter 0.15s; }
+#tab-subq .hypo-warning a:hover{ filter: brightness(1.1); }
+
+/* Recheck button — pending (shown but not yet saveable) */
+#tab-subq .recheck-btn.pending{ display:flex; opacity:0.45; cursor:not-allowed; pointer-events:none; filter:grayscale(0.5); border-style:dashed; }
+#tab-hg .recheck-panel{ width: 100%; background: white; border: 2px solid var(--primary); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 14px rgba(26,74,122,0.1); }
+#tab-hg .recheck-header{ background: var(--primary); color: white; padding: 12px 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: space-between; }
+#tab-hg .recheck-body{ padding: 18px 20px; }
+#tab-hg .alg-pills{ display: flex; gap: 8px; flex-wrap: wrap; }
+#tab-hg .alg-pill{ border: 2px solid var(--border-dk); border-radius: 20px; padding: 5px 16px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s; background: var(--neutral); color: var(--muted); font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; user-select: none; }
+#tab-hg .alg-pill[data-alg="1"].selected{ background: var(--alg1); color: white; border-color: var(--alg1); }
+#tab-hg .alg-pill[data-alg="2"].selected{ background: var(--alg2); color: white; border-color: var(--alg2); }
+#tab-hg .alg-pill[data-alg="3"].selected{ background: var(--alg3); color: white; border-color: var(--alg3); }
+#tab-hg .alg-pill[data-alg="4"].selected{ background: var(--alg4); color: white; border-color: var(--alg4); }
+#tab-hg .alg1-wrap{ display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+#tab-hg .half-toggle{ display: none; align-items: center; gap: 6px; cursor: pointer; user-select: none; padding: 1px 0; }
+#tab-hg .half-toggle.visible{ display: flex; }
+#tab-hg .half-toggle-track{ width: 30px; height: 16px; background: var(--border-dk); border-radius: 20px; position: relative; transition: background 0.18s; flex-shrink: 0; }
+#tab-hg .half-toggle-track.on{ background: var(--alg1); }
+#tab-hg .half-toggle-thumb{ position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; background: white; border-radius: 50%; transition: transform 0.18s; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+#tab-hg .half-toggle-track.on .half-toggle-thumb{ transform: translateX(14px); }
+#tab-hg .half-toggle-label{ font-size: 10px; font-weight: 700; color: var(--muted); font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; letter-spacing: 0.02em; transition: color 0.18s; }
+#tab-hg .half-toggle.on .half-toggle-label{ color: var(--alg1); }
+#tab-hg .recheck-grid{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; align-items: end; }
+#tab-hg .field-label{ font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px; }
+#tab-hg .field-val{ background: var(--neutral); border: 1.5px solid var(--border-dk); border-radius: 8px; padding: 9px 14px; font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; font-size: 16px; font-weight: 700; color: var(--muted); min-height: 46px; display: flex; align-items: center; }
+#tab-hg .field-val.filled{ color: var(--text); }
+#tab-hg .delta-display{ background: var(--neutral); border: 1.5px solid var(--border-dk); border-radius: 8px; padding: 9px 14px; font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; font-size: 16px; font-weight: 700; color: var(--muted); min-height: 46px; display: flex; align-items: center; transition: all 0.2s; }
+#tab-hg .delta-display.up{ background: var(--danger-light); border-color: #fca5a5; color: var(--danger); }
+#tab-hg .delta-display.down{ background: var(--success-lt); border-color: #86efac; color: var(--success); }
+#tab-hg .delta-display.flat{ background: var(--warning-lt); border-color: #fcd34d; color: var(--warning); }
+#tab-hg .paths-header{ font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+#tab-hg .paths-header::after{ content:''; flex:1; height:1px; background:var(--border); }
+#tab-hg .path-row{ display: flex; border: 1.5px solid var(--border-dk); border-radius: 8px; overflow: hidden; margin-bottom: 6px; opacity: 0.45; transition: all 0.2s; }
+#tab-hg .path-row:last-child{ margin-bottom: 0; }
+#tab-hg .path-row.active{ opacity: 1; transform: scale(1.008); box-shadow: 0 0 0 3px rgba(255,205,0,0.6), 0 4px 14px rgba(0,0,0,0.1); }
+#tab-hg .path-badge{ width: 170px; flex-shrink: 0; padding: 9px 12px; font-weight: 700; font-size: 11px; display: flex; align-items: center; border-right: 1px solid var(--border-dk); line-height: 1.35; }
+#tab-hg .path-action{ flex: 1; padding: 9px 14px; font-size: 12px; display: flex; align-items: center; }
+#tab-hg .path-action ul{ list-style: disc; padding-left: 16px; }
+#tab-hg .path-action ul li{ margin-bottom: 2px; }
+#tab-hg .path-p1 .path-badge{ background: var(--danger-light); color: var(--danger); }
+#tab-hg .path-p1 .path-action{ background: #fff5f5; }
+#tab-hg .path-p1.active .path-badge{ background: var(--danger); color: white; }
+#tab-hg .path-p2 .path-badge{ background: #fff7ed; color: var(--warning); }
+#tab-hg .path-p2 .path-action{ background: #fffbeb; }
+#tab-hg .path-p2.active .path-badge{ background: var(--warning); color: white; }
+#tab-hg .path-p3 .path-badge, #tab-hg .path-p4 .path-badge{ background: var(--neutral); color: #475569; }
+#tab-hg .path-p3 .path-action, #tab-hg .path-p4 .path-action{ background: white; }
+#tab-hg .path-p3.active .path-badge, #tab-hg .path-p4.active .path-badge{ background: #475569; color: white; }
+#tab-hg .path-p5 .path-badge{ background: var(--success-lt); color: var(--success); }
+#tab-hg .path-p5 .path-action{ background: #f0fdf4; }
+#tab-hg .path-p5.active .path-badge{ background: var(--success); color: white; }
+#tab-hg .path-p6 .path-badge, #tab-hg .path-p7 .path-badge{ background: #fef2f2; color: #991b1b; }
+#tab-hg .path-p6 .path-action, #tab-hg .path-p7 .path-action{ background: #fef9f9; }
+#tab-hg .path-p6.active .path-badge, #tab-hg .path-p7.active .path-badge{ background: #991b1b; color: white; }
+#tab-hg .path-p8 .path-badge{ background: var(--info-lt); color: var(--info); }
+#tab-hg .path-p8 .path-action{ background: #f0f9ff; }
+#tab-hg .path-p8.active .path-badge{ background: var(--info); color: white; }
+#tab-hg .hypo-link-btn{ display: inline-flex; align-items: center; gap: 5px; background: var(--danger-mid); color: white; border: none; border-radius: 5px; padding: 3px 10px; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: none; margin-top: 4px; transition: background 0.15s; }
+#tab-hg .hypo-link-btn.warn{ background: #b45309; }
+#tab-hg .hypo-link-btn:hover{ filter: brightness(1.1); }
+@keyframes hg-rate-arrive{ 0% { transform: scale(0.94); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes hg-slideDownFade { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes hg-apply-pulse { 0% { box-shadow: 0 0 0 0 rgba(21,128,61,0.65), 0 3px 10px rgba(21,128,61,0.30); } 65% { box-shadow: 0 0 0 10px rgba(21,128,61,0.00), 0 3px 10px rgba(21,128,61,0.30); } 100% { box-shadow: 0 0 0 0 rgba(21,128,61,0.00), 0 3px 10px rgba(21,128,61,0.30); } }
+#tab-hg .result-box{ display: none; margin-bottom: 14px; background: white; border: 2.5px solid var(--cl-accent-dk); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 18px rgba(224,180,0,0.20); }
+#tab-hg .result-box.visible{ display: block; animation: hg-slideDownFade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+#tab-hg .result-rate-hero{ background: var(--cl-accent); padding: 22px 24px 18px; display: flex; flex-direction: column; align-items: center; gap: 4px; animation: hg-rate-arrive 0.22s ease-out both; }
+#tab-hg .result-rate-label{ font-size: 10px; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(0,0,0,0.45); }
+#tab-hg .result-chip{ font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; font-size: 56px; font-weight: 800; color: var(--cl-dark); line-height: 1; letter-spacing: -0.02em; padding: 2px 0; }
+#tab-hg .result-units{ font-size: 12px; font-weight: 700; color: rgba(0,0,0,0.40); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0px; }
+#tab-hg .result-desc{ font-size: 11px; color: rgba(0,0,0,0.45); font-weight: 500; margin-top: 6px; }
+#tab-hg .result-box.stop-mode{ border-color: var(--danger-mid); box-shadow: 0 4px 18px rgba(185,28,28,0.15); }
+#tab-hg .result-box.stop-mode .result-rate-hero{ background: var(--danger); }
+#tab-hg .result-box.stop-mode .result-chip{ color: white; font-size: 26px; }
+#tab-hg .result-box.stop-mode .result-rate-label{ color: rgba(255,255,255,0.75); }
+#tab-hg .result-box.stop-mode .result-units{ display: none; }
+#tab-hg .result-box.stop-mode .result-desc{ color: rgba(255,255,255,0.70); }
+#tab-hg .result-apply-section{ padding: 14px 18px 16px; background: #fafafa; border-top: 1.5px solid var(--cl-accent-dk); }
+#tab-hg .result-alg-row{ display: flex; flex-direction: column; align-items: stretch; gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1.5px solid rgba(0,0,0,0.12); }
+#tab-hg .result-alg-info{ display: flex; align-items: center; gap: 10px; }
+#tab-hg .result-alg-label{ font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(0,0,0,0.45); white-space: nowrap; }
+#tab-hg .result-alg-transition{ display: flex; align-items: center; gap: 7px; flex: 1; }
+#tab-hg .alg-from-chip, #tab-hg .alg-to-chip{ border-radius: 6px; padding: 5px 14px; font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; font-size: 12px; font-weight: 800; line-height: 1; white-space: nowrap; }
+#tab-hg .alg-from-chip{ background: rgba(0,0,0,0.18); color: rgba(0,0,0,0.55); }
+#tab-hg .alg-arrow{ font-size: 16px; color: rgba(0,0,0,0.35); flex-shrink: 0; }
+#tab-hg .alg-to-chip.a1{ background: var(--alg1); color: white; }
+#tab-hg .alg-to-chip.a2{ background: var(--alg2); color: white; }
+#tab-hg .alg-to-chip.a3{ background: var(--alg3); color: white; }
+#tab-hg .alg-to-chip.a4{ background: var(--alg4); color: white; }
+#tab-hg .alg-to-chip.stay{ background: var(--success); color: white; }
+#tab-hg .alg-to-chip.half{ background: var(--alg1); color: white; }
+#tab-hg .apply-alg-btn{ display: flex; align-items: center; justify-content: center; gap: 10px; background: #15803d; color: #ffffff; border: 2.5px solid #166534; border-radius: 10px; padding: 14px 26px; font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; transition: transform 0.12s, filter 0.12s; white-space: nowrap; letter-spacing: 0.05em; text-transform: uppercase; width: 100%; animation: hg-apply-pulse 1.8s ease-out infinite; }
+#tab-hg .apply-alg-btn::before{ content: '▶'; font-size: 11px; opacity: 0.85; }
+#tab-hg .apply-alg-btn:hover{ filter: brightness(1.1); transform: translateY(-2px); }
+#tab-hg .apply-alg-btn:active{ transform: translateY(1px); filter: brightness(0.96); animation: none; }
+#tab-hg .apply-alg-btn.flash{ background: #0369a1; border-color: #075985; color: white; animation: none; }
+#tab-hg .apply-alg-btn.flash::before{ content: ''; }
+#tab-hg .apply-alg-btn.stay-btn{ background: #475569; border-color: #334155; color: white; animation: none; }
+#tab-hg .apply-alg-btn.stay-btn::before{ content: '✓'; }
+#tab-hg .apply-alg-btn.stay-btn.flash::before{ content: ''; }
+#tab-hg .apply-alg-btn.stay-btn:hover{ filter: brightness(1.1); }
+#tab-hg .apply-hint{ font-size: 11px; color: var(--muted); font-weight: 500; text-align: center; margin-top: 6px; display:block; }
+#tab-hg .loop-cycle-wrap{ width: 100%; }
+#tab-hg .loop-cycle{ background: var(--cl-dark); border: 3px solid var(--cl-accent); border-radius: 12px; padding: 18px 22px; display: flex; align-items: center; gap: 0; }
+#tab-hg .loop-cycle-inner{ display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; min-width: 110px; }
+#tab-hg .loop-arc-label{ font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.06em; text-align: center; }
+#tab-hg .loop-clock{ margin: 4px 0; }
+#tab-hg .loop-every{ font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.08em; }
+#tab-hg .loop-1hr{ font-size: 30px; font-weight: 900; color: var(--cl-accent); font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; line-height: 1; }
+#tab-hg .loop-arrow-right{ flex-shrink: 0; margin: 0 8px; }
+#tab-hg .loop-desc-block{ flex: 1; padding-left: 10px; border-left: 2px solid rgba(255,205,0,0.3); }
+#tab-hg .loop-desc-title{ font-size: 14px; font-weight: 800; color: var(--cl-accent); margin-bottom: 6px; letter-spacing: 0.01em; }
+#tab-hg .loop-desc-body{ font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.6; margin-bottom: 8px; }
+#tab-hg .loop-desc-until{ font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.5; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+#tab-hg .loop-desc-until strong{ color: rgba(255,255,255,0.8); }
+#tab-hg .bg-pair-row{ display: flex; align-items: flex-end; gap: 10px; margin-bottom: 18px; }
+#tab-hg .bg-pair-field{ flex: 1; min-width: 0; }
+#tab-hg .manual-note{ font-size: 10px; color: var(--muted); margin-top: 5px; display: flex; align-items: center; gap: 4px; line-height: 1.3; }
+#tab-hg .manual-note svg{ flex-shrink: 0; opacity: 0.6; }
+#tab-hg .monitor-box{ width: 100%; background: var(--info-lt); border: 1.5px solid #7dd3fc; border-radius: 8px; padding: 12px 18px; font-size: 12px; }
+#tab-hg .monitor-box h4{ font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--info); margin-bottom: 8px; }
+#tab-hg .monitor-steps{ display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+#tab-hg .ms{ background: white; border: 1px solid #7dd3fc; border-radius: 20px; padding: 4px 14px; font-size: 11px; font-weight: 500; }
+#tab-hg .ms-arr{ color: var(--border-dk); font-size: 16px; }
+#tab-hg .monitor-note{ font-size: 11px; color: var(--muted); margin-top: 8px; }
+#tab-hg .doc-panel{ width: 100%; background: white; border: 1.5px solid var(--border-dk); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+#tab-hg .doc-header{ background: #1e293b; color: white; padding: 11px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#tab-hg .doc-header-left{ display: flex; align-items: center; gap: 8px; }
+#tab-hg .doc-header-title{ font-size: 12px; font-weight: 700; }
+#tab-hg .doc-header-sub{ font-size: 10px; opacity: 0.5; font-style: italic; margin-left: 4px; }
+#tab-hg .doc-live-dot{ width: 7px; height: 7px; border-radius: 50%; background: #22c55e; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(34,197,94,0.3); animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%,100% { box-shadow: 0 0 0 2px rgba(34,197,94,0.3); } 50% { box-shadow: 0 0 0 5px rgba(34,197,94,0.1); } }
+#tab-hg .doc-btn-group{ display: flex; gap: 6px; }
+#tab-hg .doc-btn{ background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; padding: 4px 12px; font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+#tab-hg .doc-btn:hover{ background: rgba(255,255,255,0.2); }
+#tab-hg .doc-btn.copied{ background: #16a34a; border-color: #16a34a; }
+#tab-hg .doc-textarea{ width: 100%; min-height: 180px; border: none; outline: none; resize: vertical; padding: 14px 16px; font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; font-size: 11.5px; line-height: 1.8; color: var(--text); background: #f8fafc; box-sizing: border-box; }
+#tab-hg .doc-textarea::placeholder{ color: var(--border-dk); font-style: italic; font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif; }
+#tab-hg .doc-footer{ padding: 7px 16px; background: var(--neutral); border-top: 1px solid var(--border); font-size: 10px; color: var(--muted); font-style: italic; }
+
+@media (max-width: 680px){
+  .main{ padding: 16px 12px 50px; }
+  /* HG tab */
+  #tab-hg .trigger-node { padding: 14px 16px; gap: 12px; flex-wrap: wrap; }
+  #tab-hg .trigger-node .icon { font-size: 22px; }
+  #tab-hg .trigger-node h2 { font-size: 14px; }
+  #tab-hg .trigger-node p  { font-size: 10.5px; }
+  #tab-hg .alg-select-body { flex-direction: column; padding: 12px 14px; gap: 10px; }
+  #tab-hg .alg-select-header { font-size: 11px; padding: 10px 14px; }
+  #tab-hg .rate-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
+  #tab-hg table.rt { min-width: 340px; }
+  #tab-hg .dose-block-header { font-size: 11px; padding: 10px 14px; flex-wrap: wrap; gap: 6px; }
+  #tab-hg .dose-block-body   { flex-direction: column; padding: 14px; gap: 12px; }
+  #tab-hg .input-group       { width: 100%; }
+  #tab-hg .bg-input-wrap     { width: 100%; }
+  #tab-hg .bg-input          { width: 100%; font-size: 22px; padding: 12px 44px 12px 14px; }
+  #tab-hg .rate-output       { min-width: 0; width: 100%; }
+  #tab-hg .recheck-body { padding: 14px; }
+  #tab-hg .recheck-header { font-size: 11px; padding: 10px 14px; }
+  #tab-hg .recheck-grid { grid-template-columns: 1fr !important; gap: 12px; }
+  #tab-hg .alg-pills { flex-wrap: wrap; gap: 6px; }
+  #tab-hg .bg-pair-row { flex-direction: column; gap: 12px; }
+  #tab-hg .bg-pair-field { width: 100%; }
+  #tab-hg .bg-pair-field .bg-input-wrap { width: 100%; }
+  #tab-hg .bg-pair-field .bg-input { width: 100%; }
+  #tab-hg .result-chip   { font-size: 44px; }
+  #tab-hg .result-apply-section { padding: 12px 14px 14px; }
+  #tab-hg .path-row { flex-direction: column; }
+  #tab-hg .path-badge { width: 100%; border-right: none; border-bottom: 1px solid var(--border-dk); font-size: 11px; padding: 7px 12px; }
+  #tab-hg .path-action { font-size: 11.5px; padding: 8px 12px; }
+  #tab-hg .loop-cycle { padding: 14px 16px; flex-wrap: wrap; gap: 12px; }
+  #tab-hg .loop-cycle-inner { min-width: 80px; }
+  #tab-hg .loop-1hr { font-size: 24px; }
+  #tab-hg .loop-arrow-right { display: none; }
+  #tab-hg .loop-desc-title { font-size: 13px; }
+  #tab-hg .loop-desc-body  { font-size: 11px; }
+  #tab-hg .doc-header  { flex-wrap: wrap; gap: 6px; padding: 10px 14px; }
+  #tab-hg .doc-textarea { min-height: 140px; font-size: 11px; }
+  #tab-hg .result-alg-info { flex-direction: column; align-items: flex-start; gap: 5px; }
+  #tab-hg .result-alg-transition { width: 100%; }
+  #tab-hg .monitor-steps { flex-direction: column; align-items: flex-start; gap: 4px; }
+  #tab-hg .ms-arr { transform: rotate(90deg); margin-left: 8px; }
+}
+
+/* === SUBQ (scoped #tab-subq) === */
+#tab-subq .sel-panel{width:100%;background:#fff;border:1.5px solid var(--border-dk);border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.05);transition:opacity .2s}
+#tab-subq .sel-panel.locked{opacity:.42;pointer-events:none}
+#tab-subq .sel-panel-header{background:#f8fafc;border-bottom:1px solid var(--border);padding:9px 18px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:space-between}
+#tab-subq .sel-check{color:var(--success);font-size:13px;display:none}
+#tab-subq .sel-check.visible{display:inline}
+#tab-subq .sel-panel-body{padding:14px 18px}
+#tab-subq .opt-row{display:flex;gap:10px;flex-wrap:wrap}
+#tab-subq .opt-btn{flex:1;min-width:120px;border:2px solid var(--border-dk);border-radius:10px;padding:11px 16px;cursor:pointer;transition:all .15s;background:var(--neutral);color:var(--text);font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif;font-size:13px;font-weight:600;text-align:left;user-select:none}
+#tab-subq .opt-btn:hover{border-color:var(--cl-dark);background:#f8fafc}
+#tab-subq .opt-btn.selected{border-color:var(--cl-accent-dk);background:#fffdf0;box-shadow:0 0 0 3px rgba(6,182,212,.25)}
+#tab-subq .opt-sub{display:block;font-size:10px;font-weight:400;color:var(--muted);margin-top:2px}
+#tab-subq .opt-btn.selected .opt-sub{color:#78716c}
+#tab-subq .input-group{display:flex;flex-direction:column;gap:5px;margin-top:14px}
+#tab-subq .input-group.hidden{display:none}
+#tab-subq .field-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+#tab-subq .tdd-wrap{position:relative;display:flex;align-items:center}
+#tab-subq .tdd-input{height:54px;width:180px;border:2px solid var(--border-dk);border-radius:8px;padding:0 50px 0 14px;font-family:'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace;font-size:22px;font-weight:700;color:var(--text);background:var(--neutral);transition:all .2s;-moz-appearance:textfield;outline:none}
+#tab-subq .tdd-input::-webkit-inner-spin-button{-webkit-appearance:none}
+#tab-subq .tdd-input:focus{border-color:var(--cl-dark);background:#fff;box-shadow:0 0 0 4px rgba(0,0,0,.1)}
+#tab-subq .tdd-unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:var(--muted);pointer-events:none}
+#tab-subq .scale-indicator{display:none;align-items:center;gap:6px;padding:7px 16px;border-radius:24px;font-size:12px;font-weight:800;border:2px solid transparent;transition:all .2s;letter-spacing:.02em;margin-left:12px}
+#tab-subq .scale-indicator.visible{display:inline-flex}
+#tab-subq .si-s1{background:#f3e8ff;border-color:#d8b4fe;color:#7c3aed}
+#tab-subq .si-s2{background:#eff6ff;border-color:#bae6fd;color:#0369a1}
+#tab-subq .si-s3{background:#fffbeb;border-color:#fde68a;color:#b45309}
+#tab-subq .si-s4{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+#tab-subq .history-banner{display:none; flex-direction:column; gap:6px; background:#f8fafc; border:1px solid var(--border-dk); border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:11.5px; color:var(--muted);}
+#tab-subq .history-title{font-weight:800; color:var(--text); font-size:10px; text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:2px;}
+#tab-subq .history-item{display:flex; align-items:center; gap:8px;}
+#tab-subq .history-time{font-family:'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; font-size:10px; background:var(--border); padding:2px 6px; border-radius:4px; color:var(--text); font-weight:600;}
+#tab-subq .history-detail{color:var(--text);}
+#tab-subq .bg-calc-row{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-bottom:4px}
+#tab-subq .bg-input-side{display:flex;align-items:stretch;height:54px;gap:0;flex-shrink:0}
+#tab-subq .bg-input-wrap{position:relative;display:flex;align-items:stretch}
+#tab-subq .bg-input{width:180px; border:2px solid #16a34a; border-radius:8px 0 0 8px; padding:0 50px 0 14px; font-family:'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace; font-size:22px; font-weight:700; color:var(--text); background:#f0fdf4; transition:all .2s; -moz-appearance:textfield; outline:none; border-right:none; box-sizing:border-box;}
+#tab-subq .bg-input::-webkit-inner-spin-button{-webkit-appearance:none}
+#tab-subq .bg-input:focus{border-color:#15803d; background:#fff; box-shadow:-4px 0 0 4px rgba(21,128,61,.1);}
+#tab-subq .bg-unit{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:var(--muted);pointer-events:none}
+#tab-subq .calc-btn{background:var(--cl-dark);color:var(--cl-accent); border:2px solid var(--cl-dark); border-radius:0 8px 8px 0; padding:0 18px; font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif;font-size:13px;font-weight:700; cursor:pointer;letter-spacing:.02em;white-space:nowrap; transition:all .15s; position:relative; overflow:hidden; box-sizing:border-box; opacity: 0.5; pointer-events: none; display:flex;align-items:center;justify-content:center;}
+#tab-subq .calc-btn:hover{background:#1a1a1a;box-shadow:0 0 0 4px rgba(6,182,212,.35),0 2px 12px rgba(0,0,0,.25)}
+#tab-subq .calc-btn:active{transform:scale(.98)}
+#tab-subq .inline-result{flex:1;min-width:220px; display:flex;align-items:center;gap:14px; margin-left:12px; background:var(--neutral);border:2px solid var(--border-dk); border-radius:8px;padding:10px 16px; transition:all .25s; min-height:54px; box-sizing:border-box;}
+#tab-subq .inline-result.lit-gold{background:var(--cl-accent);border-color:var(--cl-accent-dk);box-shadow:0 2px 14px rgba(6,182,212,.4)}
+#tab-subq .inline-result.lit-green{background:var(--success-lt);border-color:#16a34a}
+#tab-subq .inline-result.lit-red{background:var(--danger-light);border-color:var(--danger-mid)}
+#tab-subq .ir-val{font-family:'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace;font-size:28px;font-weight:800;color:var(--border-dk);line-height:1;white-space:nowrap;transition:color .2s;flex-shrink:0}
+#tab-subq .inline-result.lit-gold  .ir-val{color:var(--cl-dark)}
+#tab-subq .inline-result.lit-green .ir-val{color:var(--success);font-size:18px}
+#tab-subq .inline-result.lit-red   .ir-val{color:var(--danger);font-size:24px}
+#tab-subq .ir-meta{display:flex;flex-direction:column;gap:1px;align-items:flex-start}
+#tab-subq .ir-label{font-size:11px;font-weight:700;color:var(--muted);transition:color .2s}
+#tab-subq .inline-result.lit-gold  .ir-label{color:rgba(0,0,0,.7)}
+#tab-subq .inline-result.lit-green .ir-label{color:var(--success)}
+#tab-subq .inline-result.lit-red   .ir-label{color:var(--danger)}
+#tab-subq .ir-alert{ font-size:10px; font-weight:500; font-style:italic; margin-top:1px; display:none; }
+#tab-subq .inline-result.lit-gold .ir-alert{ color:rgba(0,0,0,0.55); }
+#tab-subq .ir-hypo-btn{ display:none; margin-top:6px; background:var(--danger); color:white; border-radius:5px; padding:5px 10px; font-size:11px; font-weight:700; text-decoration:none; white-space:nowrap; transition:filter 0.15s; }
+#tab-subq .ir-hypo-btn:hover{ filter:brightness(1.1); }
+#tab-subq .inline-result.lit-red{ background:var(--danger-light); border-color:var(--danger-mid); flex-direction:row; align-items:center; }
+#tab-subq .recheck-row{display:flex;justify-content:center;margin-top:20px;}
+#tab-subq .recheck-btn{display:none;align-items:center;gap:8px; background:var(--cl-dark);color:var(--cl-accent); border:2px solid var(--cl-accent-dk);border-radius:24px; padding:10px 24px;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif; font-size:13px;font-weight:800;cursor:pointer; transition:all .15s;letter-spacing:.02em; box-shadow:0 2px 8px rgba(0,0,0,.15);}
+#tab-subq .recheck-btn.visible{display:flex}
+#tab-subq .recheck-btn:hover{background:#1a1a1a;box-shadow:0 4px 12px rgba(6,182,212,.3);transform:translateY(-1px)}
+#tab-subq .recheck-btn:active{transform:translateY(0)}
+#tab-subq .dose-table-wrap{width:100%;background:#fff;border:1.5px solid var(--border-dk);border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+#tab-subq .dose-table-header{background:var(--cl-dark);color:#fff;padding:10px 18px;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:space-between}
+#tab-subq .asp{font-size:11px;font-weight:800;background:rgba(255,255,255,.12);color:rgba(255,220,120,.9);border-radius:20px;padding:3px 14px;font-family:'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace;transition:all .2s}
+#tab-subq .asp.lit{background:var(--cl-accent);color:var(--cl-dark)}
+#tab-subq table.dt{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace;font-size:12px}
+#tab-subq .dt th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-bottom:2px solid var(--border-dk);border-right:1px solid var(--border)}
+#tab-subq .dt th:last-child{border-right:none}
+#tab-subq .dt th.bgt{background:#334155;color:#fff;text-align:left;padding-left:16px}
+#tab-subq .dt th.sc1{background:var(--s1);color:#fff}
+#tab-subq .dt th.sc2{background:var(--s2);color:#fff}
+#tab-subq .dt th.sc3{background:var(--s3);color:#fff}
+#tab-subq .dt th.sc4{background:var(--s4);color:#fff}
+#tab-subq .dt th.th-active{outline:3px solid var(--cl-accent);outline-offset:-3px}
+#tab-subq .dt td{padding:7px 10px;text-align:center;border-bottom:1px solid var(--border);border-right:1px solid var(--border);color:var(--muted);transition:background .15s}
+#tab-subq .dt td:last-child{border-right:none}
+#tab-subq .dt tr:last-child td{border-bottom:none}
+#tab-subq .dt .bgc{background:var(--neutral);font-weight:700;color:var(--text);text-align:left;padding-left:16px;border-right:2px solid var(--border-dk)}
+#tab-subq .dt .dc1{color:var(--s1)}#tab-subq .dt .dc2{color:var(--s2)}#tab-subq .dt .dc3{color:var(--s3)}#tab-subq .dt .dc4{color:var(--s4)}
+#tab-subq .dt td.col-active{font-weight:800;font-size:13px}
+#tab-subq .dt td.col-active.dc1{background:rgba(124,58,237,.07)}
+#tab-subq .dt td.col-active.dc2{background:rgba(29,78,216,.07)}
+#tab-subq .dt td.col-active.dc3{background:rgba(217,119,6,.07)}
+#tab-subq .dt td.col-active.dc4{background:rgba(185,28,28,.07)}
+#tab-subq .dt tr.row-active td{background:#fffbeb!important}
+#tab-subq .dt tr.row-active td.bgc{background:#fef3c7!important;color:var(--cl-dark)}
+#tab-subq .dt tr.row-active td.col-active{background:var(--cl-accent)!important;color:var(--cl-dark)!important;font-weight:900;font-size:14px;box-shadow:inset 0 0 0 2px var(--cl-accent-dk)}
+#tab-subq .dt tr.row-none td{background:var(--success-lt);color:var(--success);font-weight:600;font-size:11px}
+#tab-subq .dt tr.row-call td{background:var(--danger-light);color:var(--danger);font-weight:700;text-align:center}
+#tab-subq .monitor-box{width:100%;background:#fff;border:2px solid var(--primary);border-radius:10px;overflow:hidden;box-shadow:0 2px 14px rgba(26,74,122,.1)}
+#tab-subq .monitor-header{background:var(--primary);color:#fff;padding:11px 20px;font-weight:700;font-size:12px}
+#tab-subq .monitor-body{padding:16px 20px}
+#tab-subq .monitor-steps{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+#tab-subq .ms{background:var(--neutral);border:1.5px solid var(--border-dk);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;white-space:nowrap}
+#tab-subq .ms-arr{color:var(--muted);font-size:18px;font-weight:300}
+#tab-subq .monitor-note{font-size:11px;color:var(--muted);background:var(--neutral);border-radius:6px;padding:8px 12px;border-left:3px solid var(--primary);line-height:1.6}
+#tab-subq .doc-panel{width:100%;background:#fff;border:1.5px solid var(--border-dk);border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+#tab-subq .doc-header{background:#1e293b;color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+#tab-subq .doc-header-left{display:flex;align-items:center;gap:10px}
+#tab-subq .doc-live-dot{width:7px;height:7px;background:var(--cl-accent);border-radius:50%;animation:sq-pulse 2s infinite}
+@keyframes sq-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+#tab-subq .doc-header-title{font-size:12px;font-weight:700}
+#tab-subq .doc-header-sub{font-size:10px;color:rgba(255,255,255,.5)}
+#tab-subq .doc-btn-group{display:flex;gap:8px}
+#tab-subq .doc-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:5px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+#tab-subq .doc-btn:hover{background:rgba(255,255,255,.2)}
+#tab-subq .doc-btn.copied{background:var(--success);border-color:var(--success)}
+#tab-subq .doc-textarea{width:100%;min-height:110px;padding:14px 18px;font-family:'IBM Plex Mono', 'Consolas', 'Courier New', Courier, monospace;font-size:11px;line-height:1.65;border:none;outline:none;resize:vertical;color:var(--text);background:#fff}
+#tab-subq .doc-footer{background:#f8fafc;border-top:1px solid var(--border);padding:6px 18px;font-size:10px;color:var(--muted)}
+#tab-subq .nodm-badge { display: none; align-items: center; gap: 10px; padding: 11px 14px; background: linear-gradient(135deg,#f0fdf4,#dcfce7); border: 1.5px solid #86efac; border-left: 4px solid var(--success); border-radius: 8px; margin-top: 4px; }
+#tab-subq .nodm-badge-icon { font-size: 18px; flex-shrink:0; }
+#tab-subq .nodm-badge-text { font-size: 12px; color: #166534; font-weight:600; }
+#tab-subq .nodm-badge-arrow { margin-left: auto; font-size: 18px; color: var(--success); flex-shrink:0; animation: nodm-bounce 0.7s ease infinite; }
+@keyframes nodm-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+@keyframes bg-panel-glow { 0% { box-shadow: 0 0 0 0 rgba(22,163,74,0.55); border-color:#86efac; } 40% { box-shadow: 0 0 0 8px rgba(22,163,74,0.15), 0 0 18px 4px rgba(22,163,74,0.12); border-color:#4ade80; } 100% { box-shadow: none; border-color: var(--border); } }
+#tab-subq #panel-bg.nodm-glow { animation: bg-panel-glow 1.6s ease forwards; }
+@keyframes step3-pulse { 0% { background:#15803d; color:white; transform:scale(1); } 30% { background:#15803d; color:white; transform:scale(1.25); } 100% { background:var(--cl-dark); color:var(--cl-accent); transform:scale(1); } }
+#tab-subq #step3-num.pulse-green { animation: step3-pulse 0.9s ease forwards; }
+#tab-subq .calc-btn { background: var(--success) !important; color: white !important; border-color: var(--success) !important; opacity: 1 !important; pointer-events: auto !important; box-shadow: 0 2px 10px rgba(21,128,61,.30); }
+#tab-subq .calc-btn:hover { background: #166534 !important; box-shadow: 0 0 0 4px rgba(21,128,61,.25), 0 2px 12px rgba(0,0,0,.15) !important; }
+#tab-subq .calc-btn[disabled], #tab-subq .calc-btn.btn-disabled { background: var(--border-dk) !important; color: var(--muted) !important; border-color: var(--border-dk) !important; box-shadow: none !important; opacity: 1 !important; cursor: not-allowed !important; }
+
+@media(max-width:680px){
+  #tab-subq .trigger-node{padding:14px 16px;gap:12px; flex-wrap:wrap;}
+  #tab-subq .trigger-node .icon{font-size:24px}
+  #tab-subq .trigger-node h2{font-size:14px}
+  #tab-subq .trigger-node p{font-size:10.5px}
+  #tab-subq .opt-row{flex-direction:column}
+  #tab-subq .opt-btn{min-width:0;flex:unset}
+  #tab-subq .bg-calc-row{flex-direction:column;gap:8px}
+  #tab-subq .bg-input-side{width:100%;flex:unset}
+  #tab-subq .bg-input{width:100%;border-radius:8px;border-right:2px solid #16a34a}
+  #tab-subq .bg-input:focus{box-shadow:none}
+  #tab-subq .calc-btn{border-radius:8px;width:100%;height:44px;margin-top:4px}
+  #tab-subq .inline-result{margin-left:0;width:100%;flex-wrap:wrap;}
+  #tab-subq .ir-hypo-btn{margin-top:6px;width:100%;text-align:center;display:none;padding:6px 10px;}
+  #tab-subq .tdd-input{width:140px;font-size:18px}
+  #tab-subq .tdd-wrap{flex:1}
+  #tab-subq .scale-indicator{margin-left:0;margin-top:8px}
+  #tab-subq .dose-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}
+  #tab-subq table.dt{min-width:380px}
+  #tab-subq .monitor-header{font-size:11px;padding:10px 14px}
+  #tab-subq .monitor-body{padding:12px 14px}
+  #tab-subq .monitor-steps{flex-direction:column;align-items:flex-start;gap:4px}
+  #tab-subq .ms-arr{transform:rotate(90deg);margin-left:8px}
+  #tab-subq .ms{font-size:11px;padding:6px 10px}
+  #tab-subq .doc-header{flex-wrap:wrap;gap:6px;padding:10px 14px}
+  #tab-subq .doc-textarea{font-size:10px;min-height:90px}
+  #tab-subq .recheck-btn{font-size:12px;padding:9px 18px}
+  #tab-subq .sel-panel-body{padding:12px 14px}
+}
+
+/* === HYPOGLYCEMIA (scoped #tab-hypo) === */
+#tab-hypo .arrow-down{ display: flex; flex-direction: column; align-items: center; margin: 3px 0; }
+#tab-hypo .vline{ width: 2px; background: #94a3b8; }
+#tab-hypo .vline-danger{ width: 2px; background: var(--danger-mid); }
+#tab-hypo .ahead{ width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 9px solid var(--border-dk); }
+#tab-hypo .ahead-danger{ border-top-color: var(--danger-mid); }
+#tab-hypo .node-trigger{ background: linear-gradient(135deg, #2b0808 0%, #1a0505 100%); border-left: 6px solid var(--danger); border-radius: 10px; padding: 18px 24px; display: flex; align-items: center; gap: 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(220,38,38,0.1); width: 100%; max-width: 700px; text-align: left; }
+#tab-hypo .node-trigger .trigger-label{ display: inline-block; background: var(--danger); color: white; border-radius: 5px; padding: 3px 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+#tab-hypo .node-trigger h2{ font-size: 16px; font-weight: 800; margin-bottom: 4px; color: white; }
+#tab-hypo .node-trigger p{ font-size: 11px; color: rgba(255,255,255,0.6); font-style: italic; }
+#tab-hypo .action-card{ width: 100%; max-width: 700px; border-radius: 10px; overflow: hidden; border: 1.5px solid var(--danger-mid); box-shadow: 0 1px 6px rgba(185,28,28,0.1); }
+#tab-hypo .action-card-header{ background: var(--danger); color: white; padding: 10px 18px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
+#tab-hypo .action-card-body{ background: white; padding: 14px 18px; }
+#tab-hypo .action-step{ display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+#tab-hypo .action-step:last-child{ border-bottom: none; }
+#tab-hypo .action-icon{ width: 24px; height: 24px; border-radius: 50%; background: var(--cl-dark); color: var(--cl-accent); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+#tab-hypo .action-content{ flex: 1; font-size: 12px; line-height: 1.5; }
+#tab-hypo .sub-note{ font-size: 11px; color: var(--muted); margin-top: 2px; font-style: italic; }
+#tab-hypo .diamond-wrap{ width: 100%; max-width: 700px; display: flex; justify-content: center; }
+#tab-hypo .diamond{ background: var(--danger-light); border: 2px solid var(--danger-mid); border-radius: 8px; padding: 14px 28px; text-align: center; font-weight: 700; font-size: 14px; color: var(--danger-muted); max-width: 460px; }
+#tab-hypo .diamond .sub{ font-size: 11px; font-weight: 400; margin-top: 4px; color: var(--muted); font-style: italic; }
+#tab-hypo .branch-wrap{ width: 100%; max-width: 860px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; }
+#tab-hypo .sev-card.caution .sev-card-header{ background: var(--warning); }
+#tab-hypo .branch{ display: flex; flex-direction: column; gap: 8px; }
+#tab-hypo .branch-label{ text-align: center; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 5px 12px; border-radius: 20px; background: var(--warning-lt); color: var(--warning); border: 1px solid #fcd34d; }
+#tab-hypo .branch-label.severe{ background: var(--danger-light); color: var(--danger); border-color: #fca5a5; }
+#tab-hypo .sev-card{ border-radius: 10px; overflow: hidden; border: 1.5px solid #fcd34d; flex: 1; }
+#tab-hypo .sev-card.severe{ border-color: var(--danger-mid); }
+#tab-hypo .sev-card-header{ background: #92400e; color: white; padding: 9px 14px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
+#tab-hypo .sev-card.severe .sev-card-header{ background: var(--danger); }
+#tab-hypo .sev-card-body{ background: white; padding: 12px 14px; }
+#tab-hypo .sev-step{ display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+#tab-hypo .sev-step:last-child{ border-bottom: none; }
+#tab-hypo .sev-icon{ width: 20px; height: 20px; border-radius: 50%; background: var(--cl-dark); color: var(--cl-accent); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+#tab-hypo .check-card{ width: 100%; max-width: 700px; background: white; border: 1.5px solid var(--border-dk); border-radius: 10px; padding: 14px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+#tab-hypo .check-card h4{ font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 12px; }
+#tab-hypo .outcome-row{ display: flex; gap: 10px; flex-wrap: wrap; }
+#tab-hypo .outcome-chip{ flex: 1; min-width: 160px; border: 1.5px solid var(--border-dk); border-radius: 8px; padding: 10px 13px; font-size: 11px; line-height: 1.6; background: white; }
+#tab-hypo .outcome-chip h5{ font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+#tab-hypo .outcome-chip.danger{ border-color: #fca5a5; background: var(--danger-pale); }
+#tab-hypo .outcome-chip.danger h5{ color: var(--danger); }
+#tab-hypo .outcome-chip.warning{ border-color: #fcd34d; background: var(--warning-lt); }
+#tab-hypo .outcome-chip.warning h5{ color: var(--warning); }
+#tab-hypo .outcome-chip.success{ border-color: #86efac; background: var(--success-lt); }
+#tab-hypo .outcome-chip.success h5{ color: var(--success); }
+#tab-hypo .badge-connector{ display: flex; flex-direction: column; align-items: center; gap: 0; margin: 3px 0; }
+#tab-hypo .badge-pill{ font-size: 11px; font-weight: 700; padding: 3px 14px; border-radius: 20px; background: var(--success-lt); color: var(--success); border: 1px solid #86efac; margin: 3px 0; }
+#tab-hypo .restart-card{ width: 100%; max-width: 700px; border-radius: 10px; overflow: hidden; border: 1.5px solid var(--cl-accent-dk); box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+#tab-hypo .restart-card-header{ background: var(--cl-dark); color: var(--cl-accent); padding: 11px 18px; font-size: 12px; font-weight: 800; letter-spacing: 0.02em; }
+#tab-hypo .restart-card-body{ background: white; padding: 16px 18px; font-size: 12px; }
+#tab-hypo .restart-card-body ul{ padding-left: 18px; line-height: 2; }
+#tab-hypo .alg-note{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+#tab-hypo .alg-note-item{ background: var(--neutral); border: 1px solid var(--border-dk); border-radius: 7px; padding: 10px 13px; font-size: 11px; line-height: 1.6; }
+#tab-hypo .alg-note-item strong{ display: block; margin-bottom: 3px; }
+#tab-hypo .return-btn{ display: inline-flex; align-items: center; gap: 10px; background: var(--cl-dark); color: var(--cl-accent); border: 2px solid var(--cl-accent); border-radius: 10px; padding: 14px 28px; font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; text-decoration: none; transition: all 0.15s; letter-spacing: 0.01em; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
+#tab-hypo .return-btn:hover{ background: var(--cl-accent); color: var(--cl-dark); box-shadow: 0 4px 16px rgba(255,205,0,0.3); transform: translateY(-1px); }
+#tab-hypo .return-btn svg{ flex-shrink: 0; }
+
+@media(max-width:680px){
+  #tab-hypo .branch-wrap { grid-template-columns: 1fr; }
+  #tab-hypo .alg-note { grid-template-columns: 1fr; }
+  #tab-hypo .node-trigger { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px; }
+  #tab-hypo .action-card-header { font-size: 11px; padding: 9px 14px; }
+  #tab-hypo .check-card { padding: 12px 14px; }
+  #tab-hypo .outcome-row { flex-direction: column; }
+  #tab-hypo .restart-card-body { padding: 14px 16px; }
+  #tab-hypo .restart-card-body ul { padding-left: 14px; line-height: 1.8; }
+  #tab-hypo .return-btn { font-size: 12px; padding: 12px 20px; }
+  #tab-hypo .diamond { padding: 12px 16px; font-size: 13px; }
+}
+/* ══ HYPO CONTEXT MODAL ══ */
+.hypo-modal-overlay{ position:fixed; inset:0; background:rgba(15,45,82,0.65); backdrop-filter:blur(3px); z-index:3000; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.2s ease; }
+.hypo-modal-overlay.open{ opacity:1; pointer-events:auto; }
+.hypo-modal{ background:white; border-radius:14px; width:92%; max-width:420px; overflow:hidden; box-shadow:0 8px 40px rgba(0,0,0,0.3); transform:scale(0.94); transition:transform 0.2s cubic-bezier(0.16,1,0.3,1); }
+.hypo-modal-overlay.open .hypo-modal{ transform:scale(1); }
+.hypo-modal-header{ background:var(--danger); color:white; padding:16px 20px; display:flex; align-items:center; gap:12px; }
+.hypo-modal-header .hm-icon{ font-size:24px; flex-shrink:0; }
+.hypo-modal-header-text h3{ font-size:14px; font-weight:800; margin:0; }
+.hypo-modal-header-text p{ font-size:11px; opacity:0.8; margin:3px 0 0; }
+.hypo-modal-body{ padding:20px; }
+.hypo-modal-q{ font-size:13px; font-weight:700; color:var(--text); margin-bottom:14px; }
+.hypo-modal-opts{ display:flex; flex-direction:column; gap:10px; }
+.hypo-modal-opt{ border:2px solid var(--border-dk); border-radius:10px; padding:13px 16px; cursor:pointer; background:var(--neutral); text-align:left; font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif; transition:all .15s; display:flex; align-items:center; gap:12px; }
+.hypo-modal-opt .hmo-icon{ font-size:20px; flex-shrink:0; }
+.hypo-modal-opt-text .hmo-title{ font-size:13px; font-weight:700; color:var(--text); }
+.hypo-modal-opt-text .hmo-sub{ font-size:10px; color:var(--muted); margin-top:2px; }
+.hypo-modal-opt.iv{ border-left:4px solid var(--primary-lt); }
+.hypo-modal-opt.iv:hover{ border-color:var(--primary-lt); background:#eff6ff; }
+.hypo-modal-opt.sq{ border-left:4px solid var(--success); }
+.hypo-modal-opt.sq:hover{ border-color:var(--success); background:#f0fdf4; }
+.hypo-modal-footer{ padding:8px 20px 16px; text-align:center; font-size:10px; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- Hypo context modal -->
+<div class="hypo-modal-overlay" id="hypo-modal-overlay" onclick="if(event.target===this)closeHypoModal()">
+  <div class="hypo-modal">
+    <div class="hypo-modal-header">
+      <div class="hm-icon">🚨</div>
+      <div class="hypo-modal-header-text">
+        <h3>Hypoglycemia Protocol</h3>
+        <p>Select the active insulin route to load the correct protocol</p>
+      </div>
+    </div>
+    <div class="hypo-modal-body">
+      <div class="hypo-modal-q">Which insulin route is this patient on?</div>
+      <div class="hypo-modal-opts">
+        <div class="hypo-modal-opt iv" onclick="hypoModalChoose('hg')">
+          <div class="hmo-icon">💧</div>
+          <div class="hypo-modal-opt-text">
+            <div class="hmo-title">Continuous IV Insulin Infusion</div>
+            <div class="hmo-sub">Insulin drip running via pump · OR or PACU</div>
+          </div>
+        </div>
+        <div class="hypo-modal-opt sq" onclick="hypoModalChoose('subq')">
+          <div class="hmo-icon">💉</div>
+          <div class="hypo-modal-opt-text">
+            <div class="hmo-title">Subcutaneous Sliding Scale</div>
+            <div class="hmo-sub">SubQ Lispro doses · DOSA or PACU</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hypo-modal-footer">Tap anywhere outside to cancel</div>
+  </div>
+</div>
+<div class="global-sidebar" id="global-sidebar">
+  <div class="sidebar-header">
+    <span style="font-weight:800;font-size:13px;color:var(--cl-dark);">Institutional Protocols</span>
+    <button onclick="toggleSidebar()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1;">&times;</button>
+  </div>
+  <div class="sidebar-content">
+      <div class="sidebar-section">
+        <div class="sidebar-title">PDF References</div>
+        <a class="sidebar-link" href="#" target="_blank">📄 Continuous IV Protocol</a>
+        <a class="sidebar-link" href="#" target="_blank">📄 SubQ Sliding Scale</a>
+        <a class="sidebar-link" href="#" target="_blank">📄 Hypoglycemia Protocol</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Contact &amp; Help</div>
+        <div style="font-size:12px;color:var(--text);margin-bottom:8px;">Endocrinology Consult:</div>
+        <a class="sidebar-link" href="tel:555-0199" style="color:var(--cl-accent-dk);">📞 Pager 555-0199</a>
+      </div>
+  </div>
+</div>
+
+<div class="hub-header">
+  <button class="hub-menu-btn" onclick="toggleSidebar()">☰</button>
+  <div class="hub-logo">
+    <div class="hub-logo-title">Perioperative Insulin Management</div>
+    <div class="hub-logo-sub">Anesthesia Clinical Decision Support &middot; OR / PACU / DOSA</div>
+  </div>
+  <button class="hub-hypo-btn" onclick="openHypoModal()">&#128680; Hypoglycemia</button>
+</div>
+
+<div class="hub-nav">
+  <button class="hub-tab active" id="nav-home" onclick="showTab('home')">&#127968; Protocol Guide</button>
+  <button class="hub-tab" id="nav-hg" onclick="showTab('hg')">&#128200; Continuous IV Insulin</button>
+  <button class="hub-tab" id="nav-subq" onclick="showTab('subq')">&#128137; SubQ Sliding Scale</button>
+  <button class="hub-tab hypo-tab" id="nav-hypo" onclick="openHypoModal()">&#128680; Hypoglycemia</button>
+</div>
+
+<div class="tab-panel active" id="tab-home">
+  <div class="home-content">
+    <div class="home-hero">
+      <h2>&#129690; Perioperative Insulin Management</h2>
+      <p>Answer a quick question to find the right protocol for your patient.<br>All protocols are also directly accessible via the tabs above.</p>
+    </div>
+    <div class="decision-card">
+      <div class="q-step" id="q1-step">
+        <div class="q-label"><span class="q-num">1</span>Where is the patient right now?</div>
+        <div class="q-options">
+          <button class="q-btn" data-val="dosa" onclick="selectLocation(this)">
+            <span class="q-btn-icon">&#127973;</span>
+            <span class="q-btn-title">Pre-Op / DOSA</span>
+            <span class="q-btn-sub">Pre-operative holding area</span>
+          </button>
+          <button class="q-btn" data-val="or" onclick="selectLocation(this)">
+            <span class="q-btn-icon">&#128294;</span>
+            <span class="q-btn-title">OR &mdash; Intraoperative</span>
+            <span class="q-btn-sub">Patient currently in the OR</span>
+          </button>
+          <button class="q-btn" data-val="pacu" onclick="selectLocation(this)">
+            <span class="q-btn-icon">&#128138;</span>
+            <span class="q-btn-title">PACU / Recovery</span>
+            <span class="q-btn-sub">Post-operative recovery area</span>
+          </button>
+        </div>
+      </div>
+      <div class="q-step locked" id="q2-step">
+        <div class="q-label"><span class="q-num">2</span>Is the patient on a <strong style="color:#1e5fa8;margin-left:4px;">continuous IV insulin infusion</strong> (drip)?</div>
+        <div class="q-options">
+          <button class="q-btn" data-val="yes" onclick="selectInsulin(this)">
+            <span class="q-btn-icon">&#128167;</span>
+            <span class="q-btn-title">Yes &mdash; on insulin drip</span>
+            <span class="q-btn-sub">IV insulin infusion running via pump</span>
+          </button>
+          <button class="q-btn" data-val="no" onclick="selectInsulin(this)">
+            <span class="q-btn-icon">&#128137;</span>
+            <span class="q-btn-title">No &mdash; not on infusion</span>
+            <span class="q-btn-sub">No IV insulin / SubQ only</span>
+          </button>
+        </div>
+      </div>
+      <div class="q-result" id="q-result">
+        <div class="q-result-label">&#10003; Recommended Protocol</div>
+        <div class="q-result-protocol" id="q-result-title">&mdash;</div>
+        <div class="q-result-desc" id="q-result-desc"></div>
+        <button class="q-result-btn" id="q-result-btn">Open Protocol &rarr;</button>
+      </div>
+    </div>
+    <div class="quick-section-title">Quick Access &mdash; All Protocols</div>
+    <div class="quick-cards">
+      <div class="quick-card hg-card" onclick="showTab('hg')">
+        <div class="qc-icon">&#128200;</div>
+        <div class="qc-body"><div class="qc-title">Continuous IV Insulin</div><div class="qc-sub">OR &middot; PACU &middot; Algorithm-based &middot; Hourly BG</div></div>
+      </div>
+      <div class="quick-card sq-card" onclick="showTab('subq')">
+        <div class="qc-icon">&#128137;</div>
+        <div class="qc-body"><div class="qc-title">SubQ Sliding Scale</div><div class="qc-sub">DOSA &middot; PACU &middot; Lispro scale &middot; q4h</div></div>
+      </div>
+      <div class="quick-card hypo-card" onclick="openHypoModal()">
+        <div class="qc-icon">&#128680;</div>
+        <div class="qc-body"><div class="qc-title">Hypoglycemia Protocol</div><div class="qc-sub">BG &lt;70 &middot; Stop infusion &middot; D50W</div></div>
+      </div>
+    </div>
+    <div class="home-disclaimer">&#9877;&#65039; <strong>Clinical reference tool.</strong> Always verify per institutional policy and anesthesia provider judgment.</div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-hg">
+  <div class="layout">
+    <div class="main">
+      <div class="flow-wrap">
+
+        <div class="trigger-node">
+          <div class="icon">🩺</div>
+          <div>
+            <h2>Continuous IV Insulin Infusion — OR &amp; PACU</h2>
+            <p>Blood glucose &gt; 150 mg/dL · Insulin infusion indicated · Anesthesia team</p>
+          </div>
+          <div style="margin-left: auto; flex-shrink: 0;">
+            <div class="target-pill">🎯 Target BG 140–180</div>
+          </div>
+        </div>
+
+        <div class="connector"><div class="vl" style="height:18px;"></div><div class="ah"></div></div>
+
+        <div class="step-label">
+          <div class="step-num">1</div>
+          <div class="step-text">Select Starting Algorithm</div>
+          <div class="step-line"></div>
+        </div>
+
+        <div class="alg-select-panel">
+          <div class="alg-select-header">
+            <span>Select the appropriate starting algorithm — <span class="gold">this will pre-fill all rate calculations below</span></span>
+          </div>
+          <div class="alg-select-body">
+            <div class="alg-option selected" id="start-alg-opt-1" onclick="selectStartAlg(1)">
+              <div class="alg-opt-badge">Algorithm 1</div>
+              <div class="alg-opt-title">Most Patients</div>
+              <div class="alg-opt-desc">General surgical population without special insulin resistance risk factors</div>
+              <div class="alg-opt-check">✓ Selected</div>
+            </div>
+            <div class="alg-option" id="start-alg-opt-2" onclick="selectStartAlg(2)">
+              <div class="alg-opt-badge">Algorithm 2</div>
+              <div class="alg-opt-title">Post-CABG · Solid Organ Tx · Corticosteroids</div>
+              <div class="alg-opt-desc">Patients with higher insulin resistance or currently on systemic steroids</div>
+              <div class="alg-opt-check">✓ Selected</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="connector"><div class="vl" style="height:18px;"></div><div class="ah"></div></div>
+
+        <div class="step-label">
+          <div class="step-num">2</div>
+          <div class="step-text">Infusion Rate Table — Initial Dose</div>
+          <div class="step-line"></div>
+        </div>
+
+        <div class="dose-block">
+          <div class="dose-block-header">
+            <span>Enter Blood Glucose — Starting Infusion Rate will be calculated automatically</span>
+            <span class="badge" id="initial-alg-badge">Algorithm 1</span>
+          </div>
+          <div class="dose-block-body">
+            <div class="input-group">
+              <label>Initial Blood Glucose</label>
+              <div class="bg-input-wrap">
+                <input class="bg-input" id="initial-bg" type="number" inputmode="numeric" pattern="[0-9]*" min="40" max="700" placeholder="—" oninput="calcInitialRate()">
+                <span class="bg-unit">mg/dL</span>
+              </div>
+            </div>
+            <div class="rate-output" id="initial-rate-output">
+              <div>
+                <div class="rate-val" id="initial-rate-val">—</div>
+                <div class="rate-unit">units / hr</div>
+              </div>
+              <div class="rate-meta" id="initial-rate-meta">Enter BG to calculate rate</div>
+            </div>
+          </div>
+          
+          <div class="hypo-warning" id="initial-hypo-warn">
+            <span>⚠️ BG &lt; 90 mg/dL — Do not infuse insulin</span>
+            <a href="#" onclick="goToHypoFromHgInitial();return false;">Open Hypoglycemia Protocol →</a>
+          </div>
+        </div>
+
+        <div class="rate-table-wrap" style="margin-top:12px;">
+          <div class="rate-table-header">
+            <span>💉 Insulin Infusion Rates by Blood Glucose (units/hr)</span>
+            <div class="active-alg-pill" id="table-alg-pill">Algorithm 1 Active</div>
+          </div>
+          <table class="rt" id="rate-table">
+            <thead>
+              <tr>
+                <th class="bg-th">BG Range (mg/dL)</th>
+                <th class="a1" id="th-a1">Alg 1</th>
+                <th class="a2" id="th-a2">Alg 2</th>
+                <th class="a3" id="th-a3">Alg 3</th>
+                <th class="a4" id="th-a4">Alg 4</th>
+              </tr>
+            </thead>
+            <tbody id="rate-tbody">
+              <tr class="hypo-row">
+                <td class="bg-cell">&lt; 90</td>
+                <td colspan="4">⚠ Do NOT infuse — see Hypoglycemia Protocol</td>
+              </tr>
+              <tr data-min="90"  data-max="109">
+                <td class="bg-cell">90–109</td>
+                <td class="r1" data-a="1">0.2</td><td class="r2" data-a="2">0.5</td><td class="r3" data-a="3">1.0</td><td class="r4" data-a="4">1.5</td>
+              </tr>
+              <tr data-min="110" data-max="139">
+                <td class="bg-cell">110–139</td>
+                <td class="r1" data-a="1">0.5</td><td class="r2" data-a="2">1.0</td><td class="r3" data-a="3">2.0</td><td class="r4" data-a="4">3.0</td>
+              </tr>
+              <tr data-min="140" data-max="180">
+                <td class="bg-cell">140–180</td>
+                <td class="r1" data-a="1">1.0</td><td class="r2" data-a="2">1.5</td><td class="r3" data-a="3">3.0</td><td class="r4" data-a="4">5.0</td>
+              </tr>
+              <tr data-min="181" data-max="209">
+                <td class="bg-cell">181–209</td>
+                <td class="r1" data-a="1">1.5</td><td class="r2" data-a="2">2.0</td><td class="r3" data-a="3">4.0</td><td class="r4" data-a="4">7.0</td>
+              </tr>
+              <tr data-min="210" data-max="239">
+                <td class="bg-cell">210–239</td>
+                <td class="r1" data-a="1">2.0</td><td class="r2" data-a="2">3.0</td><td class="r3" data-a="3">5.0</td><td class="r4" data-a="4">8.0</td>
+              </tr>
+              <tr data-min="240" data-max="269">
+                <td class="bg-cell">240–269</td>
+                <td class="r1" data-a="1">2.5</td><td class="r2" data-a="2">4.0</td><td class="r3" data-a="3">6.0</td><td class="r4" data-a="4">11.0</td>
+              </tr>
+              <tr data-min="270" data-max="299">
+                <td class="bg-cell">270–299</td>
+                <td class="r1" data-a="1">3.0</td><td class="r2" data-a="2">5.0</td><td class="r3" data-a="3">8.0</td><td class="r4" data-a="4">14.0</td>
+              </tr>
+              <tr data-min="300" data-max="329">
+                <td class="bg-cell">300–329</td>
+                <td class="r1" data-a="1">3.5</td><td class="r2" data-a="2">6.0</td><td class="r3" data-a="3">10.0</td><td class="r4" data-a="4">17.0</td>
+              </tr>
+              <tr data-min="330" data-max="359">
+                <td class="bg-cell">330–359</td>
+                <td class="r1" data-a="1">4.0</td><td class="r2" data-a="2">7.0</td><td class="r3" data-a="3">12.0</td><td class="r4" data-a="4">22.0</td>
+              </tr>
+              <tr data-min="360" data-max="9999">
+                <td class="bg-cell">&gt; 360</td>
+                <td class="r1" data-a="1">6.0</td><td class="r2" data-a="2">10.0</td><td class="r3" data-a="3">16.0</td><td class="r4" data-a="4">28.0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="connector" style="margin:6px 0;">
+          <div class="vl" style="height:16px;"></div>
+          <div class="connector-badge gold">⏱ 1 hour — check blood glucose</div>
+          <div class="vl" style="height:16px;"></div>
+          <div class="ah"></div>
+        </div>
+
+        <div class="step-label">
+          <div class="step-num">3</div>
+          <div class="step-text">Hourly Blood Glucose Recheck — Rate Adjustment</div>
+          <div class="step-line"></div>
+        </div>
+
+        <div class="recheck-panel">
+          <div class="recheck-header">
+            <span>🔄 Each Hour: Update Algorithm · Confirm Last BG · Enter New POC Glucose</span>
+          </div>
+          <div class="recheck-body">
+
+            <div class="recheck-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 16px;">
+              <div>
+                <div class="field-label">Current Algorithm</div>
+                <div class="alg-pills">
+                  <div class="alg1-wrap">
+                    <button class="alg-pill selected" data-alg="1" onclick="setRecheckAlg('1')">Alg 1</button>
+                    <div class="half-toggle" id="half-toggle" onclick="toggleHalf()">
+                      <div class="half-toggle-track" id="half-track">
+                        <div class="half-toggle-thumb"></div>
+                      </div>
+                      <span class="half-toggle-label" id="half-label">÷2 half-rate</span>
+                    </div>
+                  </div>
+                  <button class="alg-pill" data-alg="2" onclick="setRecheckAlg('2')">Alg 2</button>
+                  <button class="alg-pill" data-alg="3" onclick="setRecheckAlg('3')">Alg 3</button>
+                  <button class="alg-pill" data-alg="4" onclick="setRecheckAlg('4')">Alg 4</button>
+                </div>
+              </div>
+              <div>
+                <div class="field-label">Current Rate Running</div>
+                <div class="field-val" id="recheck-current-rate">—</div>
+              </div>
+            </div>
+
+            <div class="bg-pair-row">
+              <div class="bg-pair-field">
+                <div class="field-label">Last POC Glucose</div>
+                <div class="bg-input-wrap">
+                  <input class="bg-input" id="last-bg" style="width:100%;" type="number" readonly placeholder="Auto-filled">
+                  <span class="bg-unit">mg/dL</span>
+                </div>
+                <div class="manual-note">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Auto-populated from previous step
+                </div>
+              </div>
+
+              <div class="bg-pair-field new-bg-field">
+                <div class="field-label new-bg-label">
+                  <span class="new-bg-arrow">▶</span> New POC Glucose
+                </div>
+                <div class="bg-input-wrap">
+                  <input class="bg-input" id="new-bg" style="width:100%; font-size:22px;" type="number" inputmode="numeric" pattern="[0-9]*" min="20" max="700" placeholder="Enter new BG" oninput="onNewBgInput()">
+                  <span class="bg-unit">mg/dL</span>
+                </div>
+                <div class="new-bg-hint">↑ Enter the hourly glucose reading here</div>
+              </div>
+
+              <div class="bg-pair-field">
+                <div class="field-label">Change from Last</div>
+                <div class="delta-display" id="delta-display">—</div>
+                <div style="font-size:11px; color:var(--muted); margin-top:4px;" id="delta-note"></div>
+              </div>
+            </div>
+
+            <div class="result-box" id="result-box">
+              <div class="result-rate-hero">
+                <div class="result-rate-label" id="result-box-label">Set Infusion To</div>
+                <div class="result-chip" id="result-rate">—</div>
+                <div class="result-units" id="result-units">units / hr</div>
+                <div class="result-desc" id="result-desc"></div>
+              </div>
+              <div class="result-alg-row" id="result-alg-row" style="display:none;">
+                <div class="result-apply-section">
+                  <div class="result-alg-info" style="margin-bottom:12px;">
+                    <div class="result-alg-label">Algorithm Update:</div>
+                    <div class="result-alg-transition">
+                      <div class="alg-from-chip" id="alg-from-chip">—</div>
+                      <div class="alg-arrow" id="alg-arrow">→</div>
+                      <div class="alg-to-chip" id="alg-to-chip">—</div>
+                    </div>
+                  </div>
+                  <button class="apply-alg-btn" id="apply-alg-btn" onclick="applyAlgorithm()">APPLY CHANGE</button>
+                  <span class="apply-hint" id="apply-hint">Logs entry · Carries BG forward · Resets for next check</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hypo-warning" id="hg-recheck-hypo-warn">
+              <span>⚠️ BG &lt; 90 mg/dL — STOP INFUSION IMMEDIATELY</span>
+              <a href="#" onclick="goToHypoFromHgRecheck();return false;">Open Hypoglycemia Protocol →</a>
+            </div>
+
+            <div class="paths-header">Protocol Guidance</div>
+
+            <div class="path-row path-p1" id="path-1">
+              <div class="path-badge">🚨 BG &lt; 70 mg/dL</div>
+              <div class="path-action">
+                <div>
+                  <strong>STOP infusion immediately</strong>
+                  <br><a class="hypo-link-btn" href="#" onclick="goToHypoFromHgRecheck();return false;">Open Hypoglycemia Protocol →</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="path-row path-p2" id="path-2">
+              <div class="path-badge">⚠️ BG 70–89 mg/dL</div>
+              <div class="path-action">
+                <div>
+                  <strong>STOP infusion immediately</strong>
+                  <br><a class="hypo-link-btn warn" href="#" onclick="goToHypoFromHgRecheck();return false;">Open Hypoglycemia Protocol →</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="path-row path-p3" id="path-3">
+              <div class="path-badge">↓ BG 90–109 mg/dL</div>
+              <div class="path-action">
+                <ul>
+                  <li>Decrease by <strong>one Algorithm</strong></li>
+                  <li>If on Algorithm 1 → decrease rate by <strong>half</strong> (enable ÷2 toggle above)</li>
+                  <li>Recheck BG in 30 min</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="path-row path-p4" id="path-4">
+              <div class="path-badge">↓ BG 110–139 mg/dL</div>
+              <div class="path-action">
+                <ul>
+                  <li>Decrease by <strong>one Algorithm</strong></li>
+                  <li>If on Algorithm 1 → decrease rate by <strong>half</strong> (enable ÷2 toggle above)</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="path-row path-p5" id="path-5">
+              <div class="path-badge">✅ BG 140–180 mg/dL</div>
+              <div class="path-action">
+                <ul>
+                  <li><strong>Target range — stay in same Algorithm</strong></li>
+                  <li>Adjust rate for current BG per table</li>
+                  <li>3 consecutive stable readings → extend monitoring to q2h</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="path-row path-p6" id="path-6">
+              <div class="path-badge">↑ BG &gt; 180<br><span style="font-weight:400; font-size:10px;">dropped ≥ 50 from last</span></div>
+              <div class="path-action">
+                <ul>
+                  <li><strong>Stay in same Algorithm</strong></li>
+                  <li>Adjust rate for current BG per table</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="path-row path-p7" id="path-7">
+              <div class="path-badge">↑↑ BG &gt; 180<br><span style="font-weight:400; font-size:10px;">NOT dropped ≥ 50 from last</span></div>
+              <div class="path-action">
+                <ul>
+                  <li><strong>Move up to next Algorithm</strong></li>
+                  <li>Adjust rate for current BG per new algorithm</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="path-row path-p8" id="path-8">
+              <div class="path-badge">⬇⬇ Dropped &gt; 100<br><span style="font-weight:400; font-size:10px;">mg/dL in 1 hour</span></div>
+              <div class="path-action">
+                <ul>
+                  <li>Move down to <strong>next lesser Algorithm</strong></li>
+                  <li>If on Algorithm 1 → decrease rate by <strong>half</strong> (enable ÷2 toggle above)</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="connector" style="margin:8px 0;">
+          <div class="vl" style="height:16px;"></div>
+          <div class="ah"></div>
+        </div>
+
+        <div class="loop-cycle-wrap">
+          <div class="loop-cycle">
+            <div class="loop-cycle-inner">
+              <div class="loop-arc-label">Infusion running</div>
+              <div class="loop-clock">
+                <svg viewBox="0 0 60 60" width="54" height="54">
+                  <circle cx="30" cy="30" r="26" fill="none" stroke="#06b6d4" stroke-width="3"/>
+                  <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,205,0,0.2)" stroke-width="8"/>
+                  <line x1="30" y1="30" x2="30" y2="10" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="30" y1="30" x2="44" y2="36" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="30" cy="30" r="2.5" fill="white"/>
+                </svg>
+              </div>
+              <div class="loop-every">Every</div>
+              <div class="loop-1hr">1 hr</div>
+              <div class="loop-arc-label">check BG → adjust</div>
+            </div>
+            <div class="loop-arrow-right">
+              <svg viewBox="0 0 32 80" width="32" height="80">
+                <path d="M4 8 Q28 8 28 40 Q28 72 6 72" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-dasharray="5,3" stroke-linecap="round"/>
+                <polygon points="12,66 12,78 2,72" fill="#06b6d4"/>
+              </svg>
+            </div>
+            <div class="loop-desc-block">
+              <div class="loop-desc-title">Hourly Repeat: Step 3</div>
+              <div class="loop-desc-body">
+                After each BG result, return to the Hourly Recheck panel above.<br>
+                Update algorithm · Enter last BG · Enter new BG · Follow highlighted path.
+              </div>
+              <div class="loop-desc-until">
+                Continue until BG 140–180 for <strong>3 consecutive readings</strong>,<br>
+                then extend monitoring to q2h × 4, then q4h.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-label" style="margin-top:20px;">
+          <div class="step-num" style="background:var(--info); font-size:10px;">ℹ</div>
+          <div class="step-text">Monitoring Intervals</div>
+          <div class="step-line"></div>
+        </div>
+
+        <div class="monitor-box">
+          <h4>Blood Glucose Monitoring Schedule</h4>
+          <div class="monitor-steps">
+            <div class="ms">🕐 Every 1 hour until stable</div>
+            <div class="ms-arr">→</div>
+            <div class="ms">✅ Stable = 140–180 × 3 readings</div>
+            <div class="ms-arr">→</div>
+            <div class="ms">🕑 Every 2 hours × 4</div>
+            <div class="ms-arr">→</div>
+            <div class="ms">🕓 Every 4 hours</div>
+          </div>
+          <div class="monitor-note">
+            ⚡ <strong>Resume hourly monitoring</strong> if: rate changed · significant clinical change · glucocorticoid given · any hypoglycemia episode
+          </div>
+        </div>
+
+        <div class="step-label" style="margin-top:20px;">
+          <div class="step-num" style="background:#1e293b; font-size:10px;">📋</div>
+          <div class="step-text">Intraoperative Glycemic Management Log</div>
+          <div class="step-line"></div>
+        </div>
+
+        <div class="doc-panel">
+          <div class="doc-header">
+            <div class="doc-header-left">
+              <div class="doc-live-dot"></div>
+              <span class="doc-header-title">Auto-generated Clinical Documentation</span>
+              <span class="doc-header-sub">updates automatically · freely editable</span>
+            </div>
+            <div class="doc-btn-group">
+              <button class="doc-btn" id="copy-log-btn" onclick="hgCopyLog()">Copy</button>
+              <button class="doc-btn" onclick="hgClearLog()">Clear</button>
+            </div>
+          </div>
+          <textarea class="doc-textarea" id="hg-doc-log" placeholder="Documentation will appear here automatically as you enter blood glucose values and apply recommendations…"></textarea>
+          <div class="doc-footer">
+            Entries are generated from your inputs using system time. Edit freely to add clinical context before copying into Epic.
+          </div>
+        </div>
+
+        <div style="height:50px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-subq">
+  <div class="layout">
+    <div class="main">
+      <div class="flow-wrap">
+
+        <div class="trigger-node">
+          <div class="icon">💉</div>
+          <div>
+            <h2>Subcutaneous Insulin — Sliding Scale</h2>
+            <p>Hyperglycemia management without continuous infusion · DOSA pre-operative or PACU post-operative</p>
+          </div>
+          <div style="margin-left: auto; flex-shrink: 0;">
+            <div class="target-pill">🎯 Target BG 140–180</div>
+          </div>
+        </div>
+
+        <div class="connector"><div class="vl" style="height:16px"></div><div class="ah"></div></div>
+
+        <div class="step-label">
+          <div class="step-num">1</div><div class="step-text">Diabetes Diagnosis</div><div class="step-line"></div>
+        </div>
+        <div class="sel-panel" id="panel-dm">
+          <div class="sel-panel-header">Select diabetes type<span class="sel-check" id="chk-dm">✓ Selected</span></div>
+          <div class="sel-panel-body">
+            <div class="opt-row">
+              <button class="opt-btn" id="btn-nodm" onclick="selDm('none')">
+                ✅ Non-Diabetic
+                <span class="opt-sub">No known diabetes diagnosis</span>
+              </button>
+              <button class="opt-btn" id="btn-t1dm" onclick="selDm('t1')">
+                🔴 Type 1 / Unknown
+                <span class="opt-sub">T1DM or diabetes type unknown</span>
+              </button>
+              <button class="opt-btn" id="btn-t2dm" onclick="selDm('t2')">
+                🔶 Type 2 DM
+                <span class="opt-sub">Type 2 diabetes mellitus</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="connector"><div class="vl" style="height:16px"></div><div class="ah"></div></div>
+
+        <div class="step-label">
+          <div class="step-num">2</div><div class="step-text">Insulin Regimen &amp; Total Daily Dose</div><div class="step-line"></div>
+        </div>
+        <div class="sel-panel locked" id="panel-tx">
+          <div class="sel-panel-header">Confirm insulin regimen<span class="sel-check" id="chk-tx">✓ Confirmed</span></div>
+          <div class="sel-panel-body">
+
+            <div id="t2-row" class="opt-row" style="display:none">
+              <button class="opt-btn" id="btn-oral" onclick="selT2tx('oral')">
+                💊 Oral / Non-Insulin
+                <span class="opt-sub">Oral antihyperglycemics or non-insulin injectable (GLP-1, etc.)</span>
+              </button>
+              <button class="opt-btn" id="btn-ins" onclick="selT2tx('ins')">
+                💉 On Insulin
+                <span class="opt-sub">Currently using insulin — TDD required</span>
+              </button>
+            </div>
+
+            <div id="tdd-sec" class="input-group hidden">
+              <div class="field-label">Total Daily Dose (TDD) — basal + all bolus insulin</div>
+              <div style="display:flex;align-items:center;margin-top:6px;flex-wrap:wrap;gap:10px;">
+                <div class="tdd-wrap">
+                  <input class="tdd-input" type="number" id="tdd-inp" min="1" max="400" placeholder="40" oninput="onTdd()">
+                  <span class="tdd-unit">u/day</span>
+                </div>
+                <div id="scale-indicator" class="scale-indicator">Scale: —</div>
+              </div>
+              <label id="tdd-unknown-label" style="display:inline-flex;align-items:center;gap:7px;margin-top:10px;cursor:pointer;user-select:none;">
+                <input type="checkbox" id="chk-tdd-unknown" onchange="selTddUnknown(this.checked)"
+                  style="width:15px;height:15px;accent-color:var(--primary);cursor:pointer;flex-shrink:0;">
+                <span style="font-size:11px;color:var(--muted);font-weight:600;" id="tdd-unknown-scale-text">Home insulin dose not on record — proceed with conservative (Low-Dose) scale</span>
+              </label>
+            </div>
+            <div id="nodm-note" class="nodm-badge"><span class="nodm-badge-icon">&#9989;</span><span class="nodm-badge-text">No insulin regimen needed — proceed to Step 3 below</span><span class="nodm-badge-arrow">&#8595;</span></div>
+            <div id="t1-note" style="display:none"></div>
+            
+          </div>
+        </div>
+
+        <div class="connector"><div class="vl" style="height:16px"></div><div class="ah"></div></div>
+
+        <div class="step-label">
+          <div class="step-num" id="step3-num">3</div><div class="step-text">POC Blood Glucose &amp; Dose</div><div class="step-line"></div>
+        </div>
+        <div class="sel-panel locked" id="panel-bg">
+          <div class="sel-panel-header">Enter blood glucose reading<span class="sel-check" id="chk-bg">✓ Logged</span></div>
+          <div class="sel-panel-body">
+            
+            <div id="history-banner" class="history-banner">
+              <div class="history-title">🕒 Prior Checks</div>
+              <div id="history-list" style="display:flex; flex-direction:column; gap:4px;"></div>
+            </div>
+
+            <div class="bg-calc-row">
+              <div class="bg-input-side">
+                <div class="bg-input-wrap">
+                  <input class="bg-input" type="number" id="bg-inp" min="1" max="600" placeholder="150" oninput="onBg()" />
+                  <span class="bg-unit">mg/dL</span>
+                </div>
+                <button class="calc-btn" id="log-btn" onclick="commitSqLog()">✓ Save Record</button>
+              </div>
+              <div class="inline-result" id="ir">
+                <span class="ir-val" id="ir-val">—</span>
+                <div class="ir-meta">
+                  <span class="ir-label" id="ir-label">Type BG to view dose</span>
+                  <div class="ir-alert" id="ir-alert"></div>
+                  <a class="ir-hypo-btn" id="ir-hypo-btn" href="#" onclick="goToHypoFromSq();return false;" style="display:none;">🚨 Open Hypoglycemia Protocol →</a>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="recheck-row">
+              <button class="recheck-btn" id="recheck-btn" onclick="newSqCheck()">
+                <span>⏱</span>
+                <span id="recheck-btn-label">Recheck at —</span>
+                <span style="opacity:.6; margin-left:2px;">(New Check)</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="connector" style="margin:8px 0"><div class="vl" style="height:14px"></div><div class="ah"></div></div>
+
+        <div class="step-label" style="margin-top:8px">
+          <div class="step-num" style="background:var(--info);font-size:10px">📋</div>
+          <div class="step-text">Insulin Lispro Sliding Scale — All Categories</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="dose-table-wrap">
+          <div class="dose-table-header">
+            Lispro SubQ Dose by BG Range &amp; Patient Category
+            <span class="asp" id="asp">Select patient profile</span>
+          </div>
+          <table class="dt">
+            <thead>
+              <tr>
+                <th class="bgt">BG (mg/dL)</th>
+                <th class="sc1" id="th1">Low-Dose<br><span style="font-weight:400;font-size:9px">T1/Unk · TDD &lt; 20u</span></th>
+                <th class="sc2" id="th2">Standard<br><span style="font-weight:400;font-size:9px">Non-DM · T2 oral/TDD&lt;40 · T1 TDD 20–39u</span></th>
+                <th class="sc3" id="th3">Medium<br><span style="font-weight:400;font-size:9px">T1/T2 · TDD 40–80u</span></th>
+                <th class="sc4" id="th4">High<br><span style="font-weight:400;font-size:9px">T1/T2 · TDD &gt; 80u</span></th>
+              </tr>
+            </thead>
+            <tbody id="dtbody">
+              <tr class="row-call" data-min="0" data-max="69">
+                <td class="bgc" style="color:var(--danger)">&lt; 70</td>
+                <td colspan="4">🚨 Do not give insulin — Open Hypoglycemia Protocol</td>
+              </tr>
+              <tr class="row-none" data-min="70" data-max="149">
+                <td class="bgc">70–149</td>
+                <td colspan="4" style="text-align:center;font-style:italic">No insulin — BG within acceptable range</td>
+              </tr>
+              <tr data-min="150" data-max="199">
+                <td class="bgc">150–199</td>
+                <td class="dc1" data-col="1">0.5 u</td><td class="dc2" data-col="2">2 u</td><td class="dc3" data-col="3">3 u</td><td class="dc4" data-col="4">4 u</td>
+              </tr>
+              <tr data-min="200" data-max="249">
+                <td class="bgc">200–249</td>
+                <td class="dc1" data-col="1">1 u</td><td class="dc2" data-col="2">4 u</td><td class="dc3" data-col="3">6 u</td><td class="dc4" data-col="4">8 u</td>
+              </tr>
+              <tr data-min="250" data-max="299">
+                <td class="bgc">250–299</td>
+                <td class="dc1" data-col="1">1.5 u</td><td class="dc2" data-col="2">6 u</td><td class="dc3" data-col="3">9 u</td><td class="dc4" data-col="4">12 u</td>
+              </tr>
+              <tr data-min="300" data-max="349">
+                <td class="bgc">300–349</td>
+                <td class="dc1" data-col="1">2 u</td><td class="dc2" data-col="2">8 u</td><td class="dc3" data-col="3">12 u</td><td class="dc4" data-col="4">16 u</td>
+              </tr>
+              <tr data-min="350" data-max="399">
+                <td class="bgc">350–399</td>
+                <td class="dc1" data-col="1">2.5 u</td><td class="dc2" data-col="2">10 u</td><td class="dc3" data-col="3">15 u</td><td class="dc4" data-col="4">20 u</td>
+              </tr>
+              <tr class="row-call" data-min="400" data-max="9999">
+                <td class="bgc" style="color:var(--danger)">≥ 400</td>
+                <td colspan="4">🚨 Call Anesthesia Provider — Do not administer SubQ insulin</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="connector" style="margin:10px 0"><div class="vl" style="height:16px"></div><div class="ah"></div></div>
+
+        <div class="monitor-box">
+          <div class="monitor-header">📊 Post-Dose Monitoring &amp; Response</div>
+          <div class="monitor-body">
+            <div class="monitor-steps">
+              <div class="ms">💉 Give Lispro SubQ</div>
+              <div class="ms-arr">→</div>
+              <div class="ms">⏱ Wait 4 hours</div>
+              <div class="ms-arr">→</div>
+              <div class="ms">🩸 Recheck BG</div>
+              <div class="ms-arr">→</div>
+              <div class="ms">🔄 Repeat assessment</div>
+            </div>
+            <div class="monitor-note">
+              ⚡ <strong>BG ≥ 400 mg/dL at any recheck</strong> → Call Anesthesia Provider — do not give SubQ.<br>
+              ⚡ <strong>BG &lt; 70 mg/dL</strong> → Switch to Hypoglycemia Protocol immediately.<br>
+              ⚡ <strong>Persistent BG &gt; 180 mg/dL</strong> despite repeated SubQ corrections → Consider transitioning to continuous insulin infusion.
+            </div>
+          </div>
+        </div>
+
+        <div style="height:18px"></div>
+
+        <div class="step-label">
+          <div class="step-num" style="background:#1e293b;font-size:10px">📋</div>
+          <div class="step-text">Glycemic Management Log</div><div class="step-line"></div>
+        </div>
+        <div class="doc-panel">
+          <div class="doc-header">
+            <div class="doc-header-left">
+              <div class="doc-live-dot"></div>
+              <span class="doc-header-title">Auto-generated Clinical Documentation</span>
+              <span class="doc-header-sub">updates automatically · freely editable</span>
+            </div>
+            <div class="doc-btn-group">
+              <button class="doc-btn" id="sq-copy-btn" onclick="sqCopyLog()">Copy</button>
+              <button class="doc-btn" onclick="sqClearLog()">Clear</button>
+            </div>
+          </div>
+          <textarea class="doc-textarea" id="sq-doc-log" placeholder="Documentation appears automatically when you log the first dose. Includes patient profile header and time-stamped entries. Edit freely before copying into Epic."></textarea>
+          <div class="doc-footer">Entries generated from your inputs using system time. Edit freely before copying into Epic.</div>
+        </div>
+
+        <div style="height:50px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-hypo">
+  <div class="layout">
+    <div class="main">
+      <div class="flow-wrap">
+
+        <div class="node-trigger">
+          <div class="icon" style="font-size:30px; line-height:1; flex-shrink:0;">🚨</div>
+          <div>
+            <div class="trigger-label">Protocol Trigger</div>
+            <h2>Hypoglycemia Detected (BG &lt; 70 mg/dL)</h2>
+            <p id="hypo-trigger-sub">Insulin infusion active · Immediate action required</p>
+          </div>
+        </div>
+
+        <div class="arrow-down"><div class="vline vline-danger" style="height:20px;"></div><div class="ahead ahead-danger"></div></div>
+
+        <div class="step-label">
+          <div class="step-num">!</div>
+          <div class="step-text">Immediate Action — All BG &lt; 70 mg/dL</div>
+          <div class="step-line"></div>
+        </div>
+
+        <div class="action-card">
+          <div class="action-card-header" id="hypo-stop-header">🛑 STOP Insulin Infusion Immediately</div>
+          <div class="action-card-body">
+            <div class="action-step">
+              <div class="action-icon">1</div>
+              <div class="action-content">
+                <strong id="hypo-stop-s1-strong">Stop the insulin infusion immediately</strong>
+                <div class="sub-note" id="hypo-stop-s1-note">Do not decrease rate — stop completely</div>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-icon">2</div>
+              <div class="action-content">
+                <strong>Check BG every 15 minutes</strong>
+                <div class="sub-note">Continue monitoring until BG &gt; 100 mg/dL on 2 consecutive checks</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrow-down"><div class="vline vline-danger" style="height:20px;"></div><div class="ahead ahead-danger"></div></div>
+
+        <div class="step-label">
+          <div class="step-num">1</div>
+          <div class="step-text">Determine Severity</div>
+          <div class="step-line"></div>
+        </div>
+
+        <div class="diamond-wrap">
+          <div class="diamond">
+            What is the current blood glucose?
+            <div class="sub">Choose the path below that matches the reading</div>
+          </div>
+        </div>
+
+        <div class="branch-wrap" id="hypo-branch-wrap">
+
+          <div class="branch" id="branch-70-89">
+            <div class="branch-label">BG 70–89 mg/dL</div>
+            <div class="sev-card caution">
+              <div class="sev-card-header">⚠️ Mild — IV Drip</div>
+              <div class="sev-card-body">
+                <div class="sev-step">
+                  <div class="sev-icon">1</div>
+                  <div>Infusion already stopped
+                    <div class="sub-note">From immediate action above</div>
+                  </div>
+                </div>
+                <div class="sev-step">
+                  <div class="sev-icon">2</div>
+                  <div><strong>Recheck BG every 15 minutes</strong>
+                    <div class="sub-note">Monitor closely for further decline</div>
+                  </div>
+                </div>
+                <div class="sev-step">
+                  <div class="sev-icon">3</div>
+                  <div>If BG remains <strong>70–89 for 3 consecutive checks</strong> → consider supplemental dextrose</div>
+                </div>
+                <div class="sev-step">
+                  <div class="sev-icon">4</div>
+                  <div>When BG <strong>&gt; 90 mg/dL</strong> → resume at <strong>next lower Algorithm</strong>
+                    <div class="sub-note">If on Algorithm 1 → restart at half rate (÷2 toggle)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="branch">
+            <div class="branch-label severe">BG 60–69 mg/dL</div>
+            <div class="sev-card severe">
+              <div class="sev-card-header">🚨 Moderate Hypoglycemia</div>
+              <div class="sev-card-body">
+                <div class="sev-step">
+                  <div class="sev-icon">1</div>
+                  <div>Infusion already stopped
+                    <div class="sub-note">From immediate action above</div>
+                  </div>
+                </div>
+                <div class="sev-step">
+                  <div class="sev-icon">2</div>
+                  <div><strong>Recheck BG every 15 minutes</strong>
+                    <div class="sub-note">Monitor closely for further decline</div>
+                  </div>
+                </div>
+                <div class="sev-step">
+                  <div class="sev-icon">3</div>
+                  <div>If BG recovers to 70–89 → follow the <strong>70–89 protocol</strong> at left
+                    <div class="sub-note">Resume insulin only after BG &gt; 90 mg/dL</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="branch">
+            <div class="branch-label severe">BG &lt; 60 mg/dL</div>
+            <div class="sev-card severe">
+              <div class="sev-card-header">🚨 Severe Hypoglycemia</div>
+              <div class="sev-card-body">
+                <div class="sev-step">
+                  <div class="sev-icon">1</div>
+                  <div>Infusion already stopped
+                    <div class="sub-note">From immediate action above</div>
+                  </div>
+                </div>
+                <div class="sev-step">
+                  <div class="sev-icon">2</div>
+                  <div><strong>Give D50W 25 mL IV push immediately</strong>
+                    <div class="sub-note">Dextrose 50% — 25 mL bolus</div>
+                  </div>
+                </div>
+                <div class="sev-step">
+                  <div class="sev-icon">3</div>
+                  <div><strong>Recheck BG every 15 minutes</strong></div>
+                </div>
+                <div class="sev-step">
+                  <div class="sev-icon">4</div>
+                  <div>If BG still &lt; 60 at 15 min → <strong>repeat D50W 25 mL IV</strong>
+                    <div class="sub-note">Repeat until BG &gt; 60 mg/dL</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><div class="arrow-down" style="margin-top:12px;">
+          <div class="vline" style="height:20px;"></div><div class="ahead"></div>
+        </div>
+
+        <div class="step-label">
+          <div class="step-num">2</div>
+          <div class="step-text">Monitoring — Recheck Every 15 Minutes</div>
+          <div class="step-line"></div>
+        </div>
+
+        <div class="check-card">
+          <h4>BG Response — Every 15 Minutes After Stopping Infusion</h4>
+          <div class="outcome-row">
+            <div class="outcome-chip danger">
+              <h5>🔴 BG Still &lt; 60 mg/dL at 15 min</h5>
+              Repeat D50W 25 mL IV push<br>
+              Continue q15 min checks
+            </div>
+            <div class="outcome-chip warning">
+              <h5>🟡 BG 60–99 mg/dL</h5>
+              Continue monitoring q15 min<br>
+              If 70–89 for 3 checks → consider supplemental dextrose<br>
+              Wait for 2 consecutive BGs &gt; 100 mg/dL
+            </div>
+            <div class="outcome-chip success">
+              <h5>🟢 BG &gt; 100 mg/dL × 2 consecutive</h5>
+              Proceed to restart protocol below →
+            </div>
+          </div>
+        </div>
+
+        <div class="badge-connector">
+          <div class="vline" style="height:14px;"></div>
+          <div class="badge-pill">2 consecutive BGs &gt; 100 mg/dL</div>
+          <div class="vline" style="height:6px;"></div>
+          <div class="ahead"></div>
+        </div>
+
+        <div class="step-label">
+          <div class="step-num">3</div>
+          <div class="step-text" id="hypo-step3-title">Restart Insulin Infusion</div>
+          <div class="step-line"></div>
+        </div>
+
+        <div class="restart-card" id="hypo-restart-iv">
+          <div class="restart-card-header" id="hypo-restart-header">✅ Restart at Adjusted Algorithm</div>
+          <div class="restart-card-body">
+            <ul>
+              <li>Restart infusion at the <strong>next lesser Algorithm</strong> than what was running when hypoglycemia occurred</li>
+              <li>If patient was already on <strong>Algorithm 1</strong> → restart at <strong>half the previous rate</strong></li>
+              <li>Identify current BG in the rate table and infuse at the appropriate rate for the new algorithm</li>
+              <li>Resume <strong>hourly BG monitoring</strong> immediately upon restart</li>
+            </ul>
+            <div class="alg-note">
+              <div class="alg-note-item">
+                <strong>Was on Algorithm 2, 3, or 4</strong>
+                Restart one step lower (e.g., Alg 3 → restart at Alg 2)<br>
+                Find new rate for current BG in the table
+              </div>
+              <div class="alg-note-item">
+                <strong>Was on Algorithm 1</strong>
+                Restart at Algorithm 1 at <strong>half</strong> the rate for the current BG range (use ÷2 toggle)
+              </div>
+            </div>
+            <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:6px;">
+              <div id="hypo-return-note" style="font-size:11px; color:var(--muted); font-style:italic;">Hypoglycemia resolved — resume hourly monitoring in the continuous protocol</div>
+              <a class="return-btn" href="#" onclick="returnFromHypo();return false;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/>
+                </svg>
+                <span id="hypo-return-text">Return to Continuous IV Protocol</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="restart-card" id="hypo-restart-sq" style="display:none;">
+          <div class="restart-card-header">✅ Resume SubQ Monitoring</div>
+          <div class="restart-card-body">
+            <ul>
+              <li>Do <strong>not</strong> give SubQ insulin until BG &gt; 90 mg/dL on 2 consecutive checks</li>
+              <li>When BG recovers, resume q4h subcutaneous checks per sliding scale</li>
+              <li>If hypoglycemia was from a SubQ dose, reassess the assigned scale at the next check</li>
+              <li>If recurrent hypoglycemia → notify anesthesia provider before next dose</li>
+            </ul>
+            <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:6px;">
+              <div id="hypo-return-note-sq" style="font-size:11px; color:var(--muted); font-style:italic;">Hypoglycemia resolved — resume SubQ sliding scale monitoring</div>
+              <a class="return-btn" href="#" onclick="returnFromHypo();return false;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/>
+                </svg>
+                Return to SubQ Protocol
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:50px;"></div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── GLOBAL HELPER ──────────────────────────────────────────
+function getNowTime(){
+  const d = new Date();
+  return d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:false});
+}
+
+// ── 1. GLOBAL NAV & SIDEBAR ────────────────────────────────
+window.lastClinicalTab = 'hg'; // default to Continuous IV
+
+function showTab(name){
+  if(name === 'hg' || name === 'subq'){
+    window.lastClinicalTab = name;
+  }
+
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.hub-tab').forEach(t=>t.classList.remove('active'));
+  var panel=document.getElementById('tab-'+name);
+  var tab=document.getElementById('nav-'+name);
+  if(panel)panel.classList.add('active');
+  if(tab)tab.classList.add('active');
+  if(name==='hypo') updateHypoContext();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function returnFromHypo(){
+  showTab(window.lastClinicalTab || 'hg');
+}
+
+function updateHypoContext(){
+  const fromSubQ = (window.lastClinicalTab === 'subq');
+
+  // Trigger subtitle
+  const sub = document.getElementById('hypo-trigger-sub');
+  if(sub) sub.textContent = fromSubQ
+    ? 'SubQ sliding scale active · Do not give next dose'
+    : 'Insulin infusion active · Immediate action required';
+
+  // Immediate action card header
+  const hdr = document.getElementById('hypo-stop-header');
+  if(hdr) hdr.textContent = fromSubQ
+    ? '🛑 Do NOT Give Next SubQ Insulin Dose'
+    : '🛑 STOP Insulin Infusion Immediately';
+
+  // Step 1 stop content
+  const s1s = document.getElementById('hypo-stop-s1-strong');
+  const s1n = document.getElementById('hypo-stop-s1-note');
+  if(s1s) s1s.textContent = fromSubQ
+    ? 'Do not administer next SubQ insulin dose'
+    : 'Stop the insulin infusion immediately';
+  if(s1n) s1n.textContent = fromSubQ
+    ? 'Hold all pending SubQ insulin doses'
+    : 'Do not decrease rate — stop completely';
+
+  // 70-89 branch: IV-specific — hide for SubQ patients
+  const br7089 = document.getElementById('branch-70-89');
+  const bw = document.getElementById('hypo-branch-wrap');
+  if(br7089){ br7089.style.display = fromSubQ ? 'none' : ''; }
+  if(bw){ bw.style.gridTemplateColumns = fromSubQ ? '1fr 1fr' : '1fr 1fr 1fr'; }
+
+  // Step 3 title
+  const s3title = document.getElementById('hypo-step3-title');
+  if(s3title) s3title.textContent = fromSubQ ? 'Resume SubQ Monitoring' : 'Restart Insulin Infusion';
+
+  // Show/hide IV vs SubQ restart cards
+  const restartIV = document.getElementById('hypo-restart-iv');
+  const restartSQ = document.getElementById('hypo-restart-sq');
+  if(restartIV) restartIV.style.display = fromSubQ ? 'none' : '';
+  if(restartSQ) restartSQ.style.display = fromSubQ ? '' : 'none';
+}
+
+function toggleSidebar(){
+  document.getElementById('global-sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+
+function openHypoModal(){
+  // If we already know the context (came from IV or SubQ directly), skip modal
+  // Only ask when navigating from a "neutral" entry point
+  document.getElementById('hypo-modal-overlay').classList.add('open');
+}
+
+function closeHypoModal(){
+  document.getElementById('hypo-modal-overlay').classList.remove('open');
+}
+
+function hypoModalChoose(source){
+  closeHypoModal();
+  window.lastClinicalTab = source;
+  showTab('hypo');
+}
+
+// ── 2. HOME TAB LOGIC ──────────────────────────────────────
+var _loc=null,_ins=null;
+function selectLocation(btn){
+  document.querySelectorAll('#q1-step .q-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  _loc=btn.dataset.val;
+  
+  var result = document.getElementById('q-result');
+  var q2=document.getElementById('q2-step');
+  
+  if(_loc==='or'){
+    // OR skips Q2 completely
+    _ins='yes';
+    q2.style.display = 'none'; 
+    updateResult();
+  } else {
+    // DOSA / PACU — unhide and unlock Q2
+    _ins=null;
+    q2.style.display = 'block';
+    q2.classList.remove('locked');
+    document.querySelectorAll('#q2-step .q-btn').forEach(b=>b.classList.remove('selected'));
+    result.style.display = 'none';
+    result.classList.remove('visible');
+  }
+}
+
+function selectInsulin(btn){
+  document.querySelectorAll('#q2-step .q-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  _ins=btn.dataset.val;
+  updateResult();
+}
+
+function updateResult(){
+  if(!_loc||!_ins)return;
+  var result=document.getElementById('q-result');
+  var title=document.getElementById('q-result-title');
+  var desc=document.getElementById('q-result-desc');
+  var btn=document.getElementById('q-result-btn');
+  var locLabel={dosa:'Pre-Op / DOSA',or:'OR — Intraoperative',pacu:'PACU'}[_loc]||_loc;
+  
+  if(_ins==='yes'){
+    title.textContent='Continuous IV Insulin Protocol';
+    if(_loc==='or'){
+      desc.textContent='Patient is intraoperative. The Continuous IV Insulin protocol is the required standard for blood glucose management in the OR.';
+    } else {
+      desc.textContent='Patient in '+locLabel+' on an active insulin infusion. Use the algorithm-based continuous infusion protocol to manage blood glucose and adjust the rate hourly.';
+    }
+    btn.onclick=function(){showTab('hg');};
+    btn.textContent='Open Continuous IV Insulin →';
+    btn.style.background='#1e5fa8';
+  }else{
+    title.textContent='SubQ Insulin Sliding Scale';
+    desc.textContent='Patient in '+locLabel+' not on a continuous infusion. Use the subcutaneous lispro sliding scale — select diabetes type and total daily dose.';
+    btn.onclick=function(){showTab('subq');};
+    btn.textContent='Open SubQ Sliding Scale →';
+    btn.style.background='#15803d';
+  }
+  result.style.display='block';
+  result.classList.add('visible');
+}
+
+
+// ── 3. CONTINUOUS IV (HG) LOGIC ────────────────────────────
+const HG_RATES = {
+  1:{r:[null,0.2,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,6.0]},
+  2:{r:[null,0.5,1.0,1.5,2.0,3.0,4.0,5.0,6.0,7.0,10.0]},
+  3:{r:[null,1.0,2.0,3.0,4.0,5.0,6.0,8.0,10.0,12.0,16.0]},
+  4:{r:[null,1.5,3.0,5.0,7.0,8.0,11.0,14.0,17.0,22.0,28.0]}
+};
+function hgBgRow(bg){
+  if(bg<90)  return 0; if(bg<=109) return 1; if(bg<=139) return 2;
+  if(bg<=180)return 3; if(bg<=209) return 4; if(bg<=239) return 5;
+  if(bg<=269)return 6; if(bg<=299) return 7; if(bg<=329) return 8;
+  if(bg<=359)return 9; return 10;
+}
+function hgGetRate(alg, bg){
+  const ri = hgBgRow(bg);
+  if(alg === '1h'){
+    const base = HG_RATES[1].r[ri];
+    return base !== null ? parseFloat((base/2).toFixed(2)) : null;
+  }
+  return HG_RATES[parseInt(alg)].r[ri];
+}
+
+let hgStartAlg = '1';
+let hgRecheckAlg = '1';
+let hgHalfRate = false;
+let hgPendingAlg = null;
+let hgLogCheckCount = 0;
+const HG_ALG_COLORS = {'1':'a1','2':'a2','3':'a3','4':'a4','1h':'half'};
+
+function hgEffectiveAlg(){ return (hgRecheckAlg==='1' && hgHalfRate) ? '1h' : hgRecheckAlg; }
+
+function selectStartAlg(a){
+  hgStartAlg = hgRecheckAlg = String(a);
+  hgHalfRate = false;
+  hgSyncHalfToggleUI();
+  [1,2].forEach(n => document.getElementById(`start-alg-opt-${n}`).classList.toggle('selected', String(n)===hgStartAlg));
+  document.querySelectorAll('#tab-hg .alg-pill').forEach(p => p.classList.toggle('selected', p.dataset.alg === hgRecheckAlg));
+  document.getElementById('table-alg-pill').textContent  = `Algorithm ${a} Active`;
+  document.getElementById('initial-alg-badge').textContent = `Algorithm ${a}`;
+  hgHighlightTableColumn(parseInt(a));
+  calcInitialRate();
+  hgRecalculate();
+}
+
+function hgSyncHalfToggleUI(){
+  const tog   = document.getElementById('half-toggle');
+  const track = document.getElementById('half-track');
+  const label = document.getElementById('half-label');
+  tog.classList.toggle('visible', hgRecheckAlg === '1');
+  track.classList.toggle('on', hgHalfRate);
+  tog.classList.toggle('on', hgHalfRate);
+  label.textContent = hgHalfRate ? '÷2 active' : '÷2 half-rate';
+}
+
+function toggleHalf(){
+  if(hgRecheckAlg !== '1') return;
+  hgHalfRate = !hgHalfRate;
+  hgSyncHalfToggleUI();
+  hgRecalculate();
+}
+
+function setRecheckAlg(a){
+  hgRecheckAlg = String(a);
+  hgHalfRate = false;
+  document.querySelectorAll('#tab-hg .alg-pill').forEach(p=>p.classList.toggle('selected', p.dataset.alg===hgRecheckAlg));
+  hgSyncHalfToggleUI();
+  hgHighlightTableColumn(parseInt(hgRecheckAlg));
+  hgRecalculate();
+}
+
+function hgHighlightTableColumn(col){
+  const c = col === '1h' ? 1 : parseInt(col);
+  document.querySelectorAll('#rate-table td[data-a]').forEach(td=>{
+    td.classList.toggle('col-active', parseInt(td.dataset.a)===c);
+  });
+  [1,2,3,4].forEach(n=>{ document.getElementById(`th-a${n}`).style.outline = n===c ? '3px solid #06b6d4' : 'none'; });
+}
+
+function hgHighlightTableRow(bg){
+  document.querySelectorAll('#rate-tbody tr').forEach(row=>{
+    row.classList.remove('row-active');
+    const mn=parseInt(row.dataset.min), mx=parseInt(row.dataset.max);
+    if(!isNaN(mn) && bg>=mn && bg<=mx) row.classList.add('row-active');
+  });
+}
+
+function hgClearTableRow(){
+  document.querySelectorAll('#rate-tbody tr').forEach(r=>r.classList.remove('row-active'));
+}
+
+function calcInitialRate(){
+  const bg    = parseInt(document.getElementById('initial-bg').value);
+  const out   = document.getElementById('initial-rate-output');
+  const valEl = document.getElementById('initial-rate-val');
+  const meta  = document.getElementById('initial-rate-meta');
+  const warn  = document.getElementById('initial-hypo-warn');
+  warn.classList.remove('visible'); out.classList.remove('active');
+
+  const lastBgEl = document.getElementById('last-bg');
+  if(!isNaN(bg) && bg > 0){
+    lastBgEl.value = bg;
+    hgRecalculate();
+  } else {
+    lastBgEl.value = '';
+  }
+
+  if(isNaN(bg)||bg<1){ valEl.textContent='—'; meta.textContent='Enter BG to calculate rate'; hgClearTableRow(); return; }
+  
+  if(bg<90){ 
+    valEl.textContent='STOP'; 
+    meta.textContent='Hypoglycemia — do not infuse'; 
+    warn.classList.add('visible'); 
+    hgClearTableRow(); 
+    return; 
+  }
+  
+  const rate = hgGetRate(hgStartAlg, bg);
+  if(rate===null){ valEl.textContent='—'; meta.textContent='BG below range'; return; }
+  valEl.textContent = rate;
+  meta.textContent  = `Algorithm ${hgStartAlg} · BG ${bg} mg/dL`;
+  out.classList.add('active');
+  hgHighlightTableRow(bg);
+  
+  const ta = document.getElementById('hg-doc-log');
+  if(!ta.value) hgLogInitial(bg, hgStartAlg, rate);
+}
+
+function onNewBgInput(){ hgRecalculate(); }
+
+function hgClearPaths(){ for(let i=1;i<=8;i++) document.getElementById(`path-${i}`).classList.remove('active'); }
+
+function hgAlgLabel(a){ return a==='1h' ? 'Alg 1 ÷2' : `Algorithm ${a}`; }
+
+function hgShowResult(rateText, descText, isStop, toAlg){
+  const box       = document.getElementById('result-box');
+  const label     = document.getElementById('result-box-label');
+  const chip      = document.getElementById('result-rate');
+  const unitsEl   = document.getElementById('result-units');
+  const desc      = document.getElementById('result-desc');
+  const algRow    = document.getElementById('result-alg-row');
+  const fromChip  = document.getElementById('alg-from-chip');
+  const arrowEl   = document.getElementById('alg-arrow');
+  const toChip    = document.getElementById('alg-to-chip');
+  const applyBtn  = document.getElementById('apply-alg-btn');
+  const applyHint = document.getElementById('apply-hint');
+
+  box.classList.add('visible');
+  hgPendingAlg = null;
+
+  if(isStop){
+    box.classList.add('stop-mode');
+    label.textContent = 'Action Required';
+    chip.textContent  = 'STOP INFUSION';
+    if(unitsEl) unitsEl.style.display = 'none';
+    desc.textContent  = descText;
+    algRow.style.display = 'none';
+    return;
+  }
+
+  box.classList.remove('stop-mode');
+  if(unitsEl) unitsEl.style.display = '';
+  label.textContent = 'Set Infusion To';
+  chip.textContent  = rateText ? rateText.replace(/\s*units\/hr/i, '') : '—';
+  desc.textContent  = descText;
+
+  const curAlg = hgEffectiveAlg();
+  const isSame = (toAlg === curAlg) || (!toAlg);
+
+  algRow.style.display = 'flex';
+  fromChip.textContent = hgAlgLabel(curAlg);
+  toChip.className = 'alg-to-chip';
+
+  if(isSame){
+    arrowEl.textContent = '='; arrowEl.style.color = 'rgba(0,0,0,0.25)';
+    toChip.textContent  = hgAlgLabel(curAlg);
+    toChip.classList.add('stay');
+    applyBtn.textContent = 'CONFIRM: KEEP SAME RATE';
+    applyBtn.className  = 'apply-alg-btn stay-btn';
+    applyHint.textContent = 'Log current status • Ready for next hour';
+    hgPendingAlg = curAlg;
+  } else {
+    const isUp = (toAlg !== '1h') && (curAlg === '1h' ? parseInt(toAlg) >= 1 : parseInt(toAlg) > parseInt(curAlg));
+    arrowEl.textContent = isUp ? '↑' : '↓';
+    arrowEl.style.color = isUp ? 'var(--danger)' : 'var(--info)';
+    toChip.textContent  = hgAlgLabel(toAlg);
+    toChip.classList.add(HG_ALG_COLORS[toAlg] || 'a1');
+    applyBtn.textContent = `APPLY CHANGE: ${hgAlgLabel(toAlg)}`;
+    applyBtn.className  = 'apply-alg-btn';
+    applyHint.textContent = 'Logs entry · Carries BG forward · Resets for next check';
+    hgPendingAlg = toAlg;
+  }
+}
+
+function hgHideResult(){
+  const box = document.getElementById('result-box');
+  box.classList.remove('visible','stop-mode');
+  document.getElementById('result-alg-row').style.display = 'none';
+  hgPendingAlg = null;
+}
+
+function applyAlgorithm(){
+  if(!hgPendingAlg) return;
+  const btn      = document.getElementById('apply-alg-btn');
+  const newBgEl  = document.getElementById('new-bg');
+  const lastBgEl = document.getElementById('last-bg');
+
+  const fromAlg   = hgEffectiveAlg();
+  const toAlgSnap = hgPendingAlg;
+  const lastBGVal = parseInt(lastBgEl.value) || null;
+  const newBGVal  = parseInt(newBgEl.value)  || null;
+  const rateChip  = document.getElementById('result-rate').textContent + ' units/hr';
+  const isStop    = document.getElementById('result-box').classList.contains('stop-mode');
+
+  if(hgPendingAlg === '1h'){
+    hgRecheckAlg = '1'; hgHalfRate = true;
+    document.querySelectorAll('#tab-hg .alg-pill').forEach(p=>p.classList.toggle('selected', p.dataset.alg==='1'));
+    hgSyncHalfToggleUI(); hgHighlightTableColumn(1);
+  } else {
+    setRecheckAlg(hgPendingAlg);
+  }
+
+  if(lastBGVal && newBGVal){
+    if(isStop){ hgLogStop(lastBGVal, newBGVal); } 
+    else { const extra = (newBGVal<=109) ? 'Recheck in 30 min' : null; hgLogCheck(lastBGVal, newBGVal, fromAlg, toAlgSnap, rateChip, extra); }
+  }
+
+  const prev = btn.className; const prevText = btn.textContent;
+  btn.classList.add('flash'); btn.textContent = '✓ CYCLE UPDATED';
+  setTimeout(()=>{
+    if(newBgEl.value && parseInt(newBgEl.value) > 0){
+      lastBgEl.value = newBgEl.value; newBgEl.value  = ''; newBgEl.focus();
+    }
+    btn.className = prev; btn.textContent = prevText; hgRecalculate();
+  }, 1000);
+}
+
+function hgRecalculate(){
+  const lastBG = parseInt(document.getElementById('last-bg').value);
+  const newBG  = parseInt(document.getElementById('new-bg').value);
+  const curEl  = document.getElementById('recheck-current-rate');
+  const deltaEl= document.getElementById('delta-display');
+  const noteEl = document.getElementById('delta-note');
+  const alg    = hgEffectiveAlg();
+  const warnBox= document.getElementById('hg-recheck-hypo-warn');
+
+  hgClearPaths(); hgHideResult();
+  if(warnBox) warnBox.classList.remove('visible');
+
+  if(!isNaN(lastBG)&&lastBG>0){
+    const cr=hgGetRate(alg,lastBG);
+    curEl.textContent = cr!==null ? `${cr} units/hr` : (lastBG<90?'Infusion stopped':'—');
+    curEl.classList.toggle('filled', cr!==null);
+    hgHighlightTableRow(lastBG);
+  } else { curEl.textContent='—'; curEl.classList.remove('filled'); hgClearTableRow(); }
+
+  if(isNaN(newBG)||newBG<1){ deltaEl.textContent='—'; deltaEl.className='delta-display'; noteEl.textContent=''; return; }
+
+  if(isNaN(lastBG)||lastBG<1){
+    deltaEl.textContent='—'; deltaEl.className='delta-display'; noteEl.textContent='Enter last BG for full calculation';
+    if(newBG<70){ 
+      document.getElementById('path-1').classList.add('active'); hgShowResult(null,'See Warning Below',true);
+      if(warnBox) warnBox.classList.add('visible'); 
+    }
+    else if(newBG<=89){ 
+      document.getElementById('path-2').classList.add('active'); hgShowResult(null,'See Warning Below',true);
+      if(warnBox) warnBox.classList.add('visible'); 
+    }
+    return;
+  }
+
+  const delta = newBG - lastBG;
+  deltaEl.textContent = (delta>0?'+':'')+delta+' mg/dL';
+  deltaEl.className   = 'delta-display '+(delta>0?'up':delta<0?'down':'flat');
+  noteEl.textContent  = delta>0?'↑ Rising':delta<0?'↓ Falling':'→ Stable';
+
+  let activePath=null, newRate=null, desc='', toAlg=null;
+  const isAlg1Base = (alg==='1'||alg==='1h');
+
+  if(newBG<70){
+    activePath=1; hgShowResult(null,'See Warning Below',true,null);
+    if(warnBox) warnBox.classList.add('visible');
+  }
+  else if(newBG<=89){
+    activePath=2; hgShowResult(null,'See Warning Below',true,null);
+    if(warnBox) warnBox.classList.add('visible');
+  }
+  else if(delta < -100){
+    activePath=8;
+    if(isAlg1Base){ const r=hgGetRate('1',newBG); newRate=r!==null?parseFloat((r/2).toFixed(2)):null; toAlg='1h'; desc=`BG ${newBG} mg/dL`; } 
+    else { toAlg=String(parseInt(hgRecheckAlg)-1); newRate=hgGetRate(toAlg,newBG); desc=`BG ${newBG} mg/dL`; }
+  }
+  else if(newBG<=109){
+    activePath=3;
+    if(isAlg1Base){ const r=hgGetRate('1',newBG); newRate=r!==null?parseFloat((r/2).toFixed(2)):null; toAlg='1h'; desc=`BG ${newBG} mg/dL · Recheck in 30 min`; } 
+    else { toAlg=String(parseInt(hgRecheckAlg)-1); newRate=hgGetRate(toAlg,newBG); desc=`BG ${newBG} mg/dL · Recheck in 30 min`; }
+  }
+  else if(newBG<=139){
+    activePath=4;
+    if(isAlg1Base){ const r=hgGetRate('1',newBG); newRate=r!==null?parseFloat((r/2).toFixed(2)):null; toAlg='1h'; desc=`BG ${newBG} mg/dL`; } 
+    else { toAlg=String(parseInt(hgRecheckAlg)-1); newRate=hgGetRate(toAlg,newBG); desc=`BG ${newBG} mg/dL`; }
+  }
+  else if(newBG<=180){
+    activePath=5; toAlg=alg; newRate=hgGetRate(alg,newBG); desc=`BG ${newBG} mg/dL · Target range`;
+  }
+  else {
+    if(delta<=-50){
+      activePath=6; toAlg=alg; newRate=hgGetRate(alg,newBG); desc=`BG ${newBG} mg/dL · Trending down`;
+    } else {
+      activePath=7;
+      const base=alg==='1h'?1:parseInt(hgRecheckAlg);
+      toAlg=alg==='1h'?'1':String(Math.min(4,base+1));
+      newRate=hgGetRate(toAlg,newBG); desc=`BG ${newBG} mg/dL`;
+    }
+  }
+
+  if(activePath) document.getElementById(`path-${activePath}`).classList.add('active');
+  if(newRate!==null && activePath && activePath>2) hgShowResult(`${newRate} units/hr`, desc, false, toAlg);
+}
+
+// Log Writers
+function hgAppendLog(line){
+  const ta = document.getElementById('hg-doc-log');
+  ta.value = ta.value ? ta.value + '\n' + line : line;
+  ta.scrollTop = ta.scrollHeight;
+}
+
+function hgLogInitial(bg, alg, rate){
+  const t = getNowTime();
+  const algText = alg==='1h' ? 'Algorithm 1 (÷2)' : `Algorithm ${alg}`;
+  hgAppendLog(`[${t}] INITIAL       BG ${bg} mg/dL  |  ${algText}  |  Start infusion at ${rate} units/hr`);
+}
+
+function hgLogCheck(lastBG, newBG, fromAlg, toAlg, rate, extra){
+  hgLogCheckCount++;
+  const t    = getNowTime();
+  const delta = newBG - lastBG;
+  const sign  = delta >= 0 ? '+' : '';
+  const label = `CHECK ${String(hgLogCheckCount).padStart(2,'0')}`.padEnd(13);
+
+  const fromText = fromAlg==='1h' ? 'Alg 1 ÷2' : `Alg ${fromAlg}`;
+  let algPart;
+  if(toAlg === fromAlg){ algPart = `${fromText} (no change)`; } 
+  else {
+    const toText = toAlg==='1h' ? 'Alg 1 ÷2' : `Alg ${toAlg}`;
+    const arrow  = (toAlg!=='1h' && fromAlg!=='1h' && parseInt(toAlg)>parseInt(fromAlg)) ? '↑' : '↓';
+    algPart = `${fromText} ${arrow} ${toText}`;
+  }
+
+  let line = `[${t}] ${label}  BG ${lastBG}→${newBG} mg/dL (${sign}${delta})  |  ${algPart}  |  ${rate} units/hr`;
+  if(extra) line += `  |  ${extra}`;
+  hgAppendLog(line);
+}
+
+function hgLogStop(lastBG, newBG){
+  hgLogCheckCount++;
+  const t     = getNowTime();
+  const delta = newBG - lastBG;
+  const sign  = delta >= 0 ? '+' : '';
+  const label = `CHECK ${String(hgLogCheckCount).padStart(2,'0')}`.padEnd(13);
+  hgAppendLog(`[${t}] ${label}  BG ${lastBG}→${newBG} mg/dL (${sign}${delta})  |  STOP INFUSION — Hypoglycemia protocol`);
+}
+
+function hgCopyLog(){
+  const ta  = document.getElementById('hg-doc-log');
+  const btn = document.getElementById('copy-log-btn');
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    btn.textContent = '✓ Copied'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); }, 1500);
+  }).catch(()=>{
+    ta.select(); document.execCommand('copy');
+    btn.textContent = '✓ Copied'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+function hgClearLog(){
+  if(confirm('Clear the documentation log?')){ document.getElementById('hg-doc-log').value = ''; hgLogCheckCount = 0; }
+}
+
+// ── HYPOGLYCEMIA TRANSITION LOGIC (HG) ──
+let hgInitialHypoLogged = false;
+function goToHypoFromHgInitial() {
+  const bg = parseInt(document.getElementById('initial-bg').value);
+  if (!isNaN(bg) && bg < 90 && !hgInitialHypoLogged) {
+    const t = getNowTime();
+    hgAppendLog(`[${t}] INITIAL       BG ${bg} mg/dL  |  STOP INFUSION — Transferred to Hypoglycemia Protocol`);
+    hgInitialHypoLogged = true;
+  }
+  showTab('hypo');
+}
+
+let hgLastStopLoggedStr = "";
+function goToHypoFromHgRecheck() {
+    const lastBgEl = document.getElementById('last-bg');
+    const newBgEl  = document.getElementById('new-bg');
+    const lastBGVal = parseInt(lastBgEl.value);
+    const newBGVal  = parseInt(newBgEl.value);
+
+    if (!isNaN(lastBGVal) && !isNaN(newBGVal) && newBGVal < 90) {
+        const sig = `${lastBGVal}-${newBGVal}`;
+        // Ensure we don't log the same event twice if they click the button repeatedly
+        if (hgLastStopLoggedStr !== sig) {
+            hgLogStop(lastBGVal, newBGVal);
+            hgLastStopLoggedStr = sig;
+            
+            // Auto advance the UI so it's ready when they come back
+            lastBgEl.value = newBGVal;
+            newBgEl.value = '';
+            hgRecalculate();
+        }
+    }
+    showTab('hypo');
+}
+
+selectStartAlg(1); // INIT HG
+
+
+// ── 4. SUBQ SLIDING SCALE LOGIC ────────────────────────────
+const SQ_SC={
+  sensitive:{col:1, name:'Low-Dose',   css:'si-s1', doses:[null,0.5,1,1.5,2,2.5,null]},
+  standard: {col:2, name:'Standard',   css:'si-s2', doses:[null,2,4,6,8,10,null]},
+  medium:   {col:3, name:'Medium',     css:'si-s3', doses:[null,3,6,9,12,15,null]},
+  high:     {col:4, name:'High',       css:'si-s4', doses:[null,4,8,12,16,20,null]},
+};
+
+function sqBand(bg){
+  if(bg<70)  return -1;
+  if(bg<150) return 0; 
+  if(bg<=199)return 1; 
+  if(bg<=249)return 2;
+  if(bg<=299)return 3; 
+  if(bg<=349)return 4; 
+  if(bg<=399)return 5; 
+  return 6;
+}
+
+function sqScaleKey(dm,tx,tdd){
+  if(dm==='none') return 'standard';
+  if(dm==='t1'){
+    if(!tdd||tdd<20)  return 'sensitive';
+    if(tdd<=39)        return 'standard';
+    if(tdd<=80)        return 'medium';
+    return 'high';
+  }
+  if(dm==='t2'){
+    if(tx==='oral')   return 'standard';
+    if(!tdd||tdd<40)  return 'standard';
+    if(tdd<=80)        return 'medium';
+    return 'high';
+  }
+  return null;
+}
+
+let sqState = {dm:null, tx:null, tdd:null, tddUnknown:false, bg:null};
+let sqLogN = 0, sqHeaderLogged = false;
+let sqCheckHistory = []; 
+let sqPendingDoseStr = null; 
+let sqLastLoggedBgTime = null; // Deduping variable
+
+function getEl(i){return document.getElementById(i);}
+function unlockSq(id){getEl(id).classList.remove('locked');}
+function showChkSq(id){getEl(id).classList.add('visible');}
+
+function selDm(v){
+  sqState.dm=v; sqState.tx=null; sqState.tdd=null; sqState.tddUnknown=false;
+  getEl('btn-nodm').classList.toggle('selected', v==='none');
+  getEl('btn-t1dm').classList.toggle('selected', v==='t1');
+  getEl('btn-t2dm').classList.toggle('selected', v==='t2');
+  showChkSq('chk-dm');
+  unlockSq('panel-tx');
+
+  getEl('t2-row').style.display  = (v==='t2') ? 'flex' : 'none';
+  var _t1n=getEl('t1-note'); if(_t1n) _t1n.style.display='none';
+  var _ndn=getEl('nodm-note');
+  if(_ndn) _ndn.style.display=(v==='none')?'flex':'none';
+  
+  if(v==='none'){
+    var _pbg=getEl('panel-bg');
+    if(_pbg){_pbg.classList.remove('nodm-glow'); void _pbg.offsetWidth; _pbg.classList.add('nodm-glow');}
+    var _s3=getEl('step3-num');
+    if(_s3){_s3.classList.remove('pulse-green'); void _s3.offsetWidth; _s3.classList.add('pulse-green');}
+  } else {
+    var _pbg2=getEl('panel-bg'); if(_pbg2) _pbg2.classList.remove('nodm-glow');
+  }
+  
+  getEl('tdd-sec').classList.toggle('hidden', v!=='t1');
+  getEl('chk-tx').classList.remove('visible');
+  getEl('tdd-inp').value='';
+  updateSqSI();
+  resetSqInlineResult();
+  clearSqTbl();
+
+  getEl('btn-oral').classList.remove('selected');
+  getEl('btn-ins').classList.remove('selected');
+  const chkU=getEl('chk-tdd-unknown');
+  if(chkU){ chkU.checked=false; getEl('tdd-inp').disabled=false; getEl('tdd-inp').style.opacity=''; }
+
+  if(v==='none'){
+    showChkSq('chk-tx'); unlockSq('panel-bg'); hlSqCol('standard');
+  } else if(v==='t1'){
+    getEl('panel-bg').classList.add('locked'); getEl('tdd-inp').focus();
+    var lbl=getEl('tdd-unknown-scale-text');
+    if(lbl) lbl.textContent='Home insulin dose not on record — proceed with Low-Dose scale (T1DM / TDD < 20u)';
+  } else {
+    getEl('panel-bg').classList.add('locked');
+    var lbl=getEl('tdd-unknown-scale-text');
+    if(lbl) lbl.textContent='Home insulin dose not on record — proceed with Standard scale (T2DM, conservative default)';
+  }
+}
+
+function selT2tx(v){
+  sqState.tx=v;
+  getEl('btn-oral').classList.toggle('selected', v==='oral');
+  getEl('btn-ins').classList.toggle('selected',  v==='ins');
+  if(v==='oral'){
+    getEl('tdd-sec').classList.add('hidden'); sqState.tdd=null;
+    showChkSq('chk-tx'); unlockSq('panel-bg'); updateSqSI(); hlSqCol('standard');
+  } else {
+    getEl('tdd-sec').classList.remove('hidden');
+    getEl('panel-bg').classList.add('locked');
+    getEl('chk-tx').classList.remove('visible');
+    updateSqSI(); getEl('tdd-inp').focus();
+  }
+}
+
+function onTdd(){
+  const chk=getEl('chk-tdd-unknown');
+  if(chk){ chk.checked=false; getEl('tdd-inp').disabled=false; getEl('tdd-inp').style.opacity=''; sqState.tddUnknown=false; }
+  const v=parseInt(getEl('tdd-inp').value);
+  if(isNaN(v)||v<1){ sqState.tdd=null; updateSqSI(); return; }
+  sqState.tdd=v;
+  showChkSq('chk-tx'); unlockSq('panel-bg'); updateSqSI();
+  const sk=sqScaleKey(sqState.dm, sqState.tx, sqState.tdd);
+  if(sk) hlSqCol(sk);
+  resetSqInlineResult();
+}
+
+function selTddUnknown(checked){
+  const inp = getEl('tdd-inp');
+  if(checked){
+    inp.value=''; inp.disabled=true; inp.style.opacity='0.4'; sqState.tdd=null; sqState.tddUnknown=true;
+    showChkSq('chk-tx'); unlockSq('panel-bg');
+    const sk=sqScaleKey(sqState.dm, sqState.tx, sqState.tdd);
+    const el=getEl('scale-indicator');
+    if(el&&sk){ el.className='scale-indicator visible '+SQ_SC[sk].css; el.textContent='Scale: '+SQ_SC[sk].name+' (dose not on record)'; }
+    if(sk) hlSqCol(sk);
+    resetSqInlineResult();
+  } else {
+    inp.disabled=false; inp.style.opacity=''; sqState.tdd=null; sqState.tddUnknown=false;
+    getEl('chk-tx').classList.remove('visible');
+    getEl('panel-bg').classList.add('locked');
+    getEl('scale-indicator').classList.remove('visible');
+    clearSqTbl(); resetSqInlineResult();
+  }
+}
+
+function updateSqSI(){
+  const el = getEl('scale-indicator');
+  if(!el) return;
+  if (!sqState.tdd && !sqState.tddUnknown) { el.classList.remove('visible'); return; }
+  const sk = sqScaleKey(sqState.dm, sqState.tx, sqState.tdd);
+  if(sk){ 
+    el.className = 'scale-indicator visible ' + SQ_SC[sk].css; 
+    el.textContent = 'Scale: ' + SQ_SC[sk].name + (sqState.tddUnknown ? ' (dose not on record)' : ''); 
+  } 
+  else { el.classList.remove('visible'); }
+}
+
+function onBg(){
+  const bg=parseInt(getEl('bg-inp').value);
+  const logBtn = getEl('log-btn');
+  const recheckBtn = getEl('recheck-btn');
+  if(isNaN(bg) || bg < 1){
+    resetSqInlineResult(); clearSqTblRows();
+    logBtn.classList.add('btn-disabled'); logBtn.style.opacity=''; logBtn.style.pointerEvents='';
+    recheckBtn.classList.remove('visible','pending');
+    sqPendingDoseStr = null; return;
+  }
+  if(!sqState.dm || ((sqState.dm==='t1'||(sqState.dm==='t2'&&sqState.tx==='ins'))&&!sqState.tdd&&!sqState.tddUnknown)) return; 
+  
+  const sk=sqScaleKey(sqState.dm, sqState.tx, sqState.tdd);
+  const b=sqBand(bg);
+  hlSqRow(bg); hlSqCol(sk);
+  showSqInlineResult(sk, b, bg);
+  logBtn.classList.remove('btn-disabled');
+
+  // Show recheck button as pending (greyed out) — becomes active only after Save
+  const d=new Date(); d.setHours(d.getHours()+4);
+  const t=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+  getEl('recheck-btn-label').textContent='Recheck at '+t;
+  if(!recheckBtn.classList.contains('visible')){
+    recheckBtn.classList.remove('visible');
+    recheckBtn.classList.add('pending');
+  }
+}
+
+function hlSqCol(sk){
+  const col=SQ_SC[sk]?SQ_SC[sk].col:null;
+  [1,2,3,4].forEach(n=>getEl('th'+n).classList.toggle('th-active', n===col));
+  document.querySelectorAll('#dtbody td[data-col]').forEach(td=>{ td.classList.toggle('col-active', parseInt(td.dataset.col)===col); });
+  const p=getEl('asp');
+  if(sk&&SQ_SC[sk]){ p.textContent=SQ_SC[sk].name+' Scale Active'; p.classList.add('lit'); }
+}
+function hlSqRow(bg){
+  document.querySelectorAll('#dtbody tr').forEach(r=>{
+    r.classList.remove('row-active');
+    const mn=parseInt(r.dataset.min), mx=parseInt(r.dataset.max);
+    if(!isNaN(mn)&&bg>=mn&&bg<=mx) r.classList.add('row-active');
+  });
+}
+function clearSqTbl(){
+  document.querySelectorAll('#dtbody tr').forEach(r=>r.classList.remove('row-active'));
+  [1,2,3,4].forEach(n=>getEl('th'+n).classList.remove('th-active'));
+  getEl('asp').textContent='Select patient profile'; getEl('asp').classList.remove('lit');
+}
+function clearSqTblRows(){
+  document.querySelectorAll('#dtbody tr').forEach(r=>r.classList.remove('row-active'));
+}
+
+function commitSqLog(){
+  const bg=parseInt(getEl('bg-inp').value);
+  if(isNaN(bg) || bg < 1) return;
+  if(!sqState.dm || ((sqState.dm==='t1'||(sqState.dm==='t2'&&sqState.tx==='ins'))&&!sqState.tdd&&!sqState.tddUnknown)) return;
+
+  const currentT = getNowTime();
+  if(sqLastLoggedBgTime === currentT && sqState.bg === bg) return; // Prevent double clicks
+  
+  sqState.bg=bg;
+  sqLastLoggedBgTime = currentT;
+  
+  const sk=sqScaleKey(sqState.dm, sqState.tx, sqState.tdd);
+  const b=sqBand(bg);
+  
+  showChkSq('chk-bg');
+  if(!sqHeaderLogged){ sqLogHeader(); sqHeaderLogged=true; }
+  sqLogEntry(sk, b, bg);
+  sqSetRecheck();
+  
+  sqCheckHistory.push({ time: currentT, bg: bg, dose: sqPendingDoseStr });
+  renderSqHistory();
+  
+  const logBtn = getEl('log-btn');
+  logBtn.textContent = '✓ Saved';
+  logBtn.style.background = 'var(--success)';
+  logBtn.style.borderColor = 'var(--success)';
+  setTimeout(() => {
+    logBtn.textContent = '✓ Save Record';
+    logBtn.style.background = '';
+    logBtn.style.borderColor = '';
+  }, 1500);
+}
+
+// ── HYPOGLYCEMIA TRANSITION LOGIC (SUBQ) ──
+function goToHypoFromSq() {
+    commitSqLog(); // Ensure the reading is captured in the SubQ log first
+    showTab('hypo');
+}
+
+function resetSqInlineResult(){
+  const ir=getEl('ir'); ir.className='inline-result';
+  getEl('ir-val').textContent='—'; getEl('ir-val').style.fontSize=''; 
+  getEl('ir-label').textContent='Type BG to view dose';
+  const alertEl=getEl('ir-alert'); alertEl.style.display='none'; alertEl.innerHTML='';
+  const hypoBtn=getEl('ir-hypo-btn'); if(hypoBtn) hypoBtn.style.display='none';
+  const btn=getEl('recheck-btn');
+  if(btn) btn.classList.remove('visible','pending');
+}
+
+function showSqInlineResult(sk, b, bg){
+  const ir=getEl('ir'); const alertEl=getEl('ir-alert');
+  const hypoBtn=getEl('ir-hypo-btn');
+  alertEl.style.display='none'; alertEl.innerHTML='';
+  getEl('ir-val').style.fontSize = ''; 
+  if(hypoBtn) hypoBtn.style.display='none';
+
+  const s=SQ_SC[sk];
+  if(b===-1){
+    ir.className='inline-result lit-red';
+    getEl('ir-val').textContent='STOP'; getEl('ir-val').style.fontSize='24px';
+    getEl('ir-label').textContent='Do not give insulin';
+    if(hypoBtn) hypoBtn.style.display='inline-block';
+    sqPendingDoseStr = 'Hypoglycemia Protocol';
+  } else if(b===0){
+    ir.className='inline-result lit-green';
+    getEl('ir-val').textContent='None'; getEl('ir-label').textContent='No insulin required';
+    sqPendingDoseStr = 'None';
+  } else if(b===6){
+    ir.className='inline-result lit-red';
+    getEl('ir-val').textContent='CALL'; getEl('ir-label').textContent='Anesthesia Provider';
+    alertEl.innerHTML = '↳ <i>Note: Do not give SubQ; call provider</i>';
+    alertEl.style.display = 'block';
+    sqPendingDoseStr = 'Called Provider';
+  } else {
+    const dose=s.doses[b];
+    ir.className='inline-result lit-gold';
+    getEl('ir-val').textContent=dose;
+    getEl('ir-label').textContent='unit'+(dose!==1?'s':'')+' Lispro SubQ';
+    sqPendingDoseStr = dose + ' unit' + (dose!==1?'s':'');
+    if(sk==='sensitive') {
+      alertEl.innerHTML = '↳ <i>Note: Notify provider (insulin-sensitive)</i>';
+      alertEl.style.display = 'block';
+    }
+  }
+}
+
+function renderSqHistory() {
+  if(sqCheckHistory.length === 0) { getEl('history-banner').style.display = 'none'; return; }
+  getEl('history-banner').style.display = 'flex';
+  const list = getEl('history-list'); list.innerHTML = '';
+  sqCheckHistory.forEach((h) => {
+     const div = document.createElement('div'); div.className = 'history-item';
+     div.innerHTML = `<span class="history-time">${h.time}</span> <span class="history-detail">BG <strong>${h.bg}</strong> mg/dL <span style="margin:0 4px;color:var(--border-dk)">→</span> <strong>${h.dose}</strong></span>`;
+     list.appendChild(div);
+  });
+}
+
+function sqSetRecheck(){
+  const d=new Date(); d.setHours(d.getHours()+4);
+  const t=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+  getEl('recheck-btn-label').textContent='Recheck at '+t;
+  const btn=getEl('recheck-btn');
+  btn.classList.remove('pending');
+  btn.classList.add('visible');
+}
+
+function newSqCheck(){
+  getEl('bg-inp').value='';
+  const btn=getEl('recheck-btn');
+  btn.classList.remove('visible','pending');
+  getEl('chk-bg').classList.remove('visible');
+  onBg(); getEl('bg-inp').focus();
+}
+
+function sqPatientProfile(){
+  if(sqState.dm==='none') return 'Non-diabetic patient — no home insulin.';
+  if(sqState.dm==='t1'){
+    const tddStr=sqState.tdd ? 'TDD '+sqState.tdd+' u/day' : 'TDD unknown';
+    const sk=sqScaleKey('t1',null,sqState.tdd);
+    const scaleName=SQ_SC[sk]?SQ_SC[sk].name:'—';
+    const sens=sk==='sensitive'?' (insulin-sensitive)':'';
+    return 'Type 1 / Unknown DM — on insulin, '+tddStr+'. Sliding scale: '+scaleName+sens+'.';
+  }
+  if(sqState.dm==='t2'){
+    if(sqState.tx==='oral') return 'Type 2 DM — on oral/non-insulin antihyperglycemic agents. No home insulin. Sliding scale: Standard.';
+    const tddStr=sqState.tdd ? 'TDD '+sqState.tdd+' u/day' : 'TDD unknown';
+    const sk=sqScaleKey('t2','ins',sqState.tdd);
+    const scaleName=SQ_SC[sk]?SQ_SC[sk].name:'—';
+    return 'Type 2 DM — on insulin, '+tddStr+'. Sliding scale: '+scaleName+'.';
+  }
+  return '—';
+}
+
+function sqLogHeader(){
+  const t=getNowTime();
+  const ta=getEl('sq-doc-log');
+  const divider='─'.repeat(68);
+  const header=[divider,'['+t+'] PATIENT PROFILE','         '+sqPatientProfile(),'         Protocol: SubQ Insulin Lispro Sliding Scale — DOSA/PACU','         Target glucose: 140–180 mg/dL | Recheck interval: q4h',divider].join('\n');
+  ta.value=ta.value ? ta.value+'\n'+header : header;
+  ta.scrollTop=ta.scrollHeight;
+}
+
+function sqLogEntry(sk, b, bg){
+  sqLogN++;
+  const t=getNowTime();
+  const s=SQ_SC[sk];
+  let action;
+  
+  if(b===-1){ action='BG < 70 mg/dL — STOP. Switch to Hypoglycemia Protocol.'; } 
+  else if(b===0){ action='No insulin given — BG within acceptable range (70–149 mg/dL).'; } 
+  else if(b===6){ action='BG ≥ 400 mg/dL — CALL ANESTHESIA PROVIDER. Do not give SubQ insulin.'; } 
+  else {
+    const dose=s.doses[b];
+    action='Give '+dose+' unit'+(dose!==1?'s':'')+' Insulin Lispro SubQ.';
+    if(sk==='sensitive') action+=' | NOTIFY anesthesia provider (insulin-sensitive, TDD < 20u).';
+  }
+  
+  const entry='['+t+'] CHECK '+String(sqLogN).padStart(2,'0')+'   BG '+String(bg).padEnd(6)+'mg/dL | Scale: '+s.name.padEnd(10)+'| '+action;
+  const ta=getEl('sq-doc-log');
+  ta.value=ta.value ? ta.value+'\n'+entry : entry;
+  ta.scrollTop=ta.scrollHeight;
+}
+
+function sqCopyLog(){
+  const ta=getEl('sq-doc-log'), btn=getEl('sq-copy-btn');
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    btn.textContent='✓ Copied'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1500);
+  }).catch(()=>{
+    ta.select(); document.execCommand('copy');
+    btn.textContent='✓ Copied'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1500);
+  });
+}
+
+function sqClearLog(){
+  if(confirm('Clear the documentation log?')){ getEl('sq-doc-log').value=''; sqLogN=0; sqHeaderLogged=false; }
+}
+</script>
+</body>
+</html>
